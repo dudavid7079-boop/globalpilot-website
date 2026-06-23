@@ -1,0 +1,16 @@
+{
+  "attachmentFolderPath": "public/images",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "content/blog",
+  "showUnsupportedFiles": false,
+  "userIgnoreFilters": [
+    "node_modules/",
+    ".next/",
+    ".git/",
+    "app/",
+    "components/",
+    "lib/",
+    "scripts/",
+    "public/"
+  ]
+}

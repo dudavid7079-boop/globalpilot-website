@@ -1,0 +1,26 @@
+{
+  "name": "globalpilot-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "validate:content": "node scripts/validate-content.mjs",
+    "check": "npm run validate:content && tsc --noEmit && next build"
+  },
+  "dependencies": {
+    "gray-matter": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "remark": "latest",
+    "remark-html": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "typescript": "latest"
+  }
+}
