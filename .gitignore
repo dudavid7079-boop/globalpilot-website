@@ -8,6 +8,7 @@ npm-debug.log*
 *.tsbuildinfo
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
+.obsidian/appearance.json
 .obsidian/plugins/*/main.js
 .obsidian/plugins/*/styles.css
 .obsidian/plugins/*/manifest.json
