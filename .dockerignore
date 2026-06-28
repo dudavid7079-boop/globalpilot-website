@@ -1,0 +1,9 @@
+.git
+.github
+.next
+.obsidian
+node_modules
+.env*
+npm-debug.log*
+README.md
+deploy

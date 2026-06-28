@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
+type RateBucket = { count: number; resetAt: number };
+
+const rateBuckets = new Map<string, RateBucket>();
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 12;
 
 const SYSTEM_PROMPT = `You are GlobalPilot AI, the helpful bilingual concierge for Justin's personal brand website.
 Help visitors clarify product ideas, AI automation opportunities, website strategy, and global growth plans.
@@ -17,6 +22,30 @@ function validMessages(value: unknown): ChatMessage[] | null {
     return (candidate.role === "user" || candidate.role === "assistant") && typeof candidate.content === "string" && candidate.content.trim().length > 0 && candidate.content.length <= 2000;
   });
   return messages.length === value.length ? messages : null;
+}
+
+function clientKey(request: Request) {
+  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  return forwarded || realIp || "local";
+}
+
+function isRateLimited(key: string) {
+  const now = Date.now();
+  const bucket = rateBuckets.get(key);
+  if (!bucket || bucket.resetAt <= now) {
+    rateBuckets.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  bucket.count += 1;
+  return bucket.count > RATE_LIMIT_MAX_REQUESTS;
+}
+
+function cleanModelOutput(value: string) {
+  return value
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
+    .replace(/^\s*(思考过程|Thinking):[\s\S]*?(回答|Answer):/i, "")
+    .trim();
 }
 
 async function notifyTelegram(sessionId: string, userMessage: string, aiMessage: string) {
@@ -34,6 +63,7 @@ async function notifyTelegram(sessionId: string, userMessage: string, aiMessage:
 
 export async function POST(request: Request) {
   try {
+    if (isRateLimited(clientKey(request))) return NextResponse.json({ error: "请求太频繁，请稍后再试" }, { status: 429 });
     const body = await request.json();
     const messages = validMessages(body.messages);
     const sessionId = typeof body.sessionId === "string" ? body.sessionId : "anonymous";
@@ -61,7 +91,7 @@ export async function POST(request: Request) {
       const modelMissing = response.status === 404 || payload.error?.includes("model");
       return NextResponse.json({ error: modelMissing ? `Mac mini 尚未安装模型 ${process.env.OLLAMA_MODEL || "qwen3:8b"}` : "Mac mini AI 服务暂时无法回答" }, { status: 502 });
     }
-    const message = payload.message?.content?.trim() || "";
+    const message = cleanModelOutput(payload.message?.content || "");
     if (!message) return NextResponse.json({ error: "AI 返回了空内容" }, { status: 502 });
 
     const latestUserMessage = [...messages].reverse().find((item) => item.role === "user")?.content || "";

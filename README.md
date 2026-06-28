@@ -76,6 +76,18 @@ npm run check
 
 站点已提供 `/sitemap.xml`、`/robots.txt`、`/feed.xml`、文章结构化数据、Open Graph 图片和安全响应头。联系邮箱通过 `NEXT_PUBLIC_CONTACT_EMAIL` 配置。
 
+## VPS + Caddy 部署（当前推荐）
+
+项目已包含生产 Docker 镜像、Compose、Caddy HTTPS 和 GitHub Actions 自动部署。域名默认使用 `globalpilot.attodigitalhk.com`。
+
+完整首次部署步骤见 [`deploy/README.md`](deploy/README.md)。核心链路：
+
+```text
+Obsidian → GitHub main → 内容校验/构建 → SSH VPS → Docker Compose → Caddy HTTPS
+```
+
+不需要 Vercel，也不需要 Cloudflare代理。GoDaddy 的 A 记录直接指向 VPS 公网 IP 即可。
+
 ## Mac mini Ollama + Qwen + Telegram
 
 复制环境变量模板：
