@@ -1,0 +1,12 @@
+[Unit]
+Description=GlobalPilot auto pull and deploy
+Wants=network-online.target docker.service
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+User=daviddu
+WorkingDirectory=/opt/globalpilot
+Environment=APP_DIR=/opt/globalpilot
+Environment=BRANCH=main
+ExecStart=/bin/sh /opt/globalpilot/deploy/vm-auto-pull-deploy.sh

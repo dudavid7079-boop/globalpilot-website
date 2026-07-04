@@ -24,7 +24,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: https://globalpilot.attodigitalhk.com
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_VPS_DEPLOY == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_VPS_DEPLOY == 'true' && vars.DEPLOY_MODE == 'ssh'
     needs: build
     runs-on: ubuntu-latest
     steps:

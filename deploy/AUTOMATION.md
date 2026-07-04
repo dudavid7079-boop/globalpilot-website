@@ -1,6 +1,51 @@
 # GlobalPilot 自动化运维
 
-## 1. GitHub Actions 自动部署到 VM
+## 1. 自动部署到 VM
+
+你的 SSH 入口通过 FRP 暴露。MacBook 可以访问，但 GitHub-hosted runner 可能无法访问这个 FRP 端口。推荐使用“VM 主动拉取”的方式：
+
+```text
+Obsidian / MacBook → GitHub main → VM 每分钟检查更新 → 自动 git pull + Docker rebuild
+```
+
+这条链路不需要 GitHub 从公网 SSH 进入 VM，更适合 FRP/NPM 架构。
+
+### 1.1 在 VM 上安装 systemd timer
+
+先确保仓库是最新：
+
+```bash
+cd /opt/globalpilot
+git pull --ff-only origin main
+chmod +x deploy/vm-auto-pull-deploy.sh deploy/vm-deploy-npm.sh
+```
+
+安装 timer：
+
+```bash
+sudo cp deploy/systemd/globalpilot-auto-deploy.service /etc/systemd/system/
+sudo cp deploy/systemd/globalpilot-auto-deploy.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now globalpilot-auto-deploy.timer
+```
+
+立即测试一次：
+
+```bash
+sudo systemctl start globalpilot-auto-deploy.service
+systemctl status globalpilot-auto-deploy.service --no-pager
+systemctl list-timers globalpilot-auto-deploy.timer --no-pager
+```
+
+查看日志：
+
+```bash
+journalctl -u globalpilot-auto-deploy.service -n 100 --no-pager
+```
+
+以后每次 `main` 有更新，VM 会在 1 分钟左右自动部署。
+
+## 2. 可选：GitHub Actions SSH 部署
 
 当前生产环境使用：
 
@@ -14,7 +59,14 @@ GitHub main → Actions 校验构建 → SSH 到 VM → git pull → compose.npm
 Nginx Proxy Manager / FRP → VM:3000 → Next.js app
 ```
 
-### 1.1 在 Mac 上创建 GitHub Actions 专用 SSH key
+注意：只有当 GitHub-hosted runner 能访问你的 SSH 入口时才启用此模式。当前 workflow 需要同时设置：
+
+```text
+ENABLE_VPS_DEPLOY=true
+DEPLOY_MODE=ssh
+```
+
+### 2.1 在 Mac 上创建 GitHub Actions 专用 SSH key
 
 在你的 Mac 上执行：
 
@@ -29,7 +81,7 @@ ssh-keygen -t ed25519 -C "globalpilot-github-actions" -f ~/.ssh/globalpilot_gith
 ~/.ssh/globalpilot_github_actions.pub  公钥，放到 VM
 ```
 
-### 1.2 把公钥加入 VM
+### 2.2 把公钥加入 VM
 
 在 Mac 上查看公钥：
 
@@ -53,7 +105,7 @@ nano ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 ```
 
-### 1.3 在 GitHub 仓库配置 Secrets
+### 2.3 在 GitHub 仓库配置 Secrets
 
 进入：
 
@@ -79,17 +131,18 @@ cat ~/.ssh/globalpilot_github_actions
 
 从 `-----BEGIN OPENSSH PRIVATE KEY-----` 到 `-----END OPENSSH PRIVATE KEY-----` 全部复制。
 
-### 1.4 开启自动部署开关
+### 2.4 开启自动部署开关
 
 同一页面进入 **Variables**，添加：
 
 ```text
 ENABLE_VPS_DEPLOY=true
+DEPLOY_MODE=ssh
 ```
 
 设置前 GitHub Actions 只校验构建；设置后每次推送 `main` 都会部署到 VM。
 
-### 1.5 首次验证
+### 2.5 首次验证
 
 在 Mac 上测试专用 key 能否登录：
 
@@ -103,7 +156,7 @@ ssh -i ~/.ssh/globalpilot_github_actions -p 64446 daviddu@36.50.14.11 "cd /opt/g
 GitHub Actions → VM 自动拉取 → Docker 自动重建 → 网站上线
 ```
 
-## 2. Mac mini Ollama 开机自启
+## 3. Mac mini Ollama 开机自启
 
 当前网站已经通过 Tailscale 访问 Mac mini：
 
@@ -114,7 +167,7 @@ OLLAMA_MODEL=qwen3:8b
 
 为了避免终端窗口关闭后 Ollama 停止，使用 macOS `launchd` 常驻运行。
 
-### 2.1 安装 launchd 配置
+### 3.1 安装 launchd 配置
 
 在 Mac mini 上进入项目目录，或把本仓库中的 plist 复制过去，然后执行：
 
@@ -133,7 +186,7 @@ pkill ollama
 launchctl start com.globalpilot.ollama
 ```
 
-### 2.2 检查状态
+### 3.2 检查状态
 
 ```bash
 launchctl list | grep globalpilot
@@ -154,7 +207,7 @@ curl --max-time 10 http://100.76.12.21:11434/api/tags
 /tmp/globalpilot-ollama.err.log
 ```
 
-### 2.3 停止或卸载
+### 3.3 停止或卸载
 
 ```bash
 launchctl unload ~/Library/LaunchAgents/com.globalpilot.ollama.plist
