@@ -107,6 +107,14 @@ Caddy 会在 80/443 可访问且 DNS 正确后自动申请并续期 HTTPS。
 
 ## 4. GitHub 自动部署
 
+当前 Nginx Proxy Manager / FRP 模式使用 `compose.npm.yml`，GitHub Actions 会调用：
+
+```bash
+./deploy/vm-deploy-npm.sh
+```
+
+完整配置步骤见 [`AUTOMATION.md`](AUTOMATION.md)。
+
 在一台可信电脑上创建专用部署密钥：
 
 ```bash

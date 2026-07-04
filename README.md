@@ -111,6 +111,8 @@ HTTP/2 Support: On
 
 如果 NPM 和网站容器在同一台机器，`.env.production` 中保持 `APP_BIND=127.0.0.1`。如果 NPM 在另一台机器，需要让 NPM 能访问 VM 的 `APP_PORT`，通常将 `APP_BIND` 改成 `0.0.0.0`，再用防火墙或 FRP 限制来源。
 
+自动部署与 Mac mini Ollama 开机自启见 [`deploy/AUTOMATION.md`](deploy/AUTOMATION.md)。
+
 ## Mac mini Ollama + Qwen + Telegram
 
 复制环境变量模板：
