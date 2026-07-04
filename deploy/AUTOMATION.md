@@ -213,3 +213,35 @@ curl --max-time 10 http://100.76.12.21:11434/api/tags
 launchctl unload ~/Library/LaunchAgents/com.globalpilot.ollama.plist
 rm ~/Library/LaunchAgents/com.globalpilot.ollama.plist
 ```
+
+## 4. VM 健康监控与 Telegram 告警
+
+VM 可以每 5 分钟检查：
+
+```text
+http://127.0.0.1:3000/api/health
+https://globalpilot.attodigitalhk.com/api/health
+```
+
+如果失败，会使用 `.env.production` 中的 `TELEGRAM_BOT_TOKEN` 和 `TELEGRAM_CHAT_ID` 给你发 Telegram 告警；恢复后也会发恢复通知。
+
+安装：
+
+```bash
+cd /opt/globalpilot
+git pull --ff-only origin main
+chmod +x deploy/vm-health-check.sh
+sudo cp deploy/systemd/globalpilot-health-check.service /etc/systemd/system/
+sudo cp deploy/systemd/globalpilot-health-check.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now globalpilot-health-check.timer
+sudo systemctl start globalpilot-health-check.service
+```
+
+检查：
+
+```bash
+systemctl list-timers globalpilot-health-check.timer --no-pager
+systemctl status globalpilot-health-check.service --no-pager
+journalctl -u globalpilot-health-check.service -n 100 --no-pager
+```

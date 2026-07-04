@@ -1,0 +1,12 @@
+[Unit]
+Description=Run GlobalPilot health check every 5 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+AccuracySec=20s
+Persistent=true
+Unit=globalpilot-health-check.service
+
+[Install]
+WantedBy=timers.target
