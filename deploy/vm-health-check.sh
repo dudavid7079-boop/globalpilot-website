@@ -3,7 +3,7 @@ set -eu
 
 APP_DIR="${APP_DIR:-/opt/globalpilot}"
 LOCAL_HEALTH_URL="${LOCAL_HEALTH_URL:-http://127.0.0.1:3000/api/health}"
-PUBLIC_HEALTH_URL="${PUBLIC_HEALTH_URL:-https://globalpilot.attodigitalhk.com/api/health}"
+PUBLIC_HEALTH_URL="${PUBLIC_HEALTH_URL:-}"
 STATE_FILE="${STATE_FILE:-/tmp/globalpilot-health-state}"
 
 cd "$APP_DIR"
@@ -46,10 +46,12 @@ if ! output="$(check_url "local app" "$LOCAL_HEALTH_URL" 2>&1)"; then
 - ${output}"
 fi
 
-if ! output="$(check_url "public site" "$PUBLIC_HEALTH_URL" 2>&1)"; then
-  status="failed"
-  details="${details}
+if [ -n "$PUBLIC_HEALTH_URL" ]; then
+  if ! output="$(check_url "public site" "$PUBLIC_HEALTH_URL" 2>&1)"; then
+    status="failed"
+    details="${details}
 - ${output}"
+  fi
 fi
 
 previous="unknown"
@@ -65,7 +67,7 @@ fi
 
 echo "ok" > "$STATE_FILE"
 if [ "$previous" = "failed" ]; then
-  notify "✅ GlobalPilot recovered: local app and public site are healthy."
+  notify "✅ GlobalPilot recovered: health check is healthy."
 fi
 
 echo "GlobalPilot health check ok."

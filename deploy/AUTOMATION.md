@@ -220,10 +220,11 @@ VM 可以每 5 分钟检查：
 
 ```text
 http://127.0.0.1:3000/api/health
-https://globalpilot.attodigitalhk.com/api/health
 ```
 
 如果失败，会使用 `.env.production` 中的 `TELEGRAM_BOT_TOKEN` 和 `TELEGRAM_CHAT_ID` 给你发 Telegram 告警；恢复后也会发恢复通知。
+
+公网域名建议用 UptimeRobot / Better Stack 从外部监控。部分 NPM/FRP 网络不支持 VM 访问自己的公网域名，容易产生误报；如果你的网络支持，也可以给 service 增加 `PUBLIC_HEALTH_URL=https://globalpilot.attodigitalhk.com/api/health`。
 
 安装：
 
