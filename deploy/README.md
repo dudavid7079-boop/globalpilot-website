@@ -1,6 +1,73 @@
-# VPS 首次部署
+# VPS / VM 首次部署
 
 推荐环境：Ubuntu LTS、Docker Engine、Docker Compose plugin。VPS 防火墙只需开放 SSH、TCP 80、TCP/UDP 443。
+
+如果你的 HTTP/HTTPS 已经由 Nginx Proxy Manager 统一反向代理，优先看下面的“FRP + Nginx Proxy Manager 模式”；这种情况下本项目不需要启动 Caddy。
+
+## FRP + Nginx Proxy Manager 模式
+
+适用于：
+
+- SSH 通过 FRP 暴露；
+- `globalpilot.attodigitalhk.com` 指向 NPM 所在公网入口；
+- NPM 再反向代理到运行网站的 VM。
+
+### 1. 克隆并配置
+
+```bash
+sudo mkdir -p /opt/globalpilot
+sudo chown "$USER":"$USER" /opt/globalpilot
+git clone https://github.com/dudavid7079-boop/globalpilot-website.git /opt/globalpilot
+cd /opt/globalpilot
+cp deploy/env.production.example .env.production
+nano .env.production
+```
+
+如果 NPM 和网站容器在同一台机器：
+
+```text
+APP_BIND=127.0.0.1
+APP_PORT=3000
+```
+
+如果 NPM 在另一台机器，需要通过 VM IP 或 FRP 访问网站：
+
+```text
+APP_BIND=0.0.0.0
+APP_PORT=3000
+```
+
+然后用防火墙或 FRP 规则限制来源，不要把内部服务随意开放给公网。
+
+### 2. 启动网站应用
+
+```bash
+docker compose -f compose.npm.yml --env-file .env.production up -d --build
+docker compose -f compose.npm.yml ps
+curl -i http://127.0.0.1:3000/api/health
+```
+
+### 3. Nginx Proxy Manager 配置
+
+新增 Proxy Host：
+
+```text
+Domain Names: globalpilot.attodigitalhk.com
+Scheme: http
+Forward Hostname / IP: VM 地址或 FRP 暴露给 NPM 的地址
+Forward Port: 3000
+Websockets Support: On
+```
+
+SSL 页面：
+
+```text
+Request a new SSL Certificate
+Force SSL: On
+HTTP/2 Support: On
+```
+
+DNS 应指向 NPM 的公网入口 IP，而不是一定指向 VM 本机 IP。
 
 ## 1. GoDaddy DNS
 

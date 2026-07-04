@@ -88,6 +88,29 @@ Obsidian → GitHub main → 内容校验/构建 → SSH VPS → Docker Compose 
 
 不需要 Vercel，也不需要 Cloudflare代理。GoDaddy 的 A 记录直接指向 VPS 公网 IP 即可。
 
+## VM + FRP + Nginx Proxy Manager 部署
+
+如果 SSH 通过 FRP 代理、HTTP/HTTPS 已由 Nginx Proxy Manager 统一反代，则不要在本项目里再启 Caddy。使用 `compose.npm.yml` 只启动 Next.js 应用：
+
+```bash
+docker compose -f compose.npm.yml --env-file .env.production up -d --build
+```
+
+NPM 里新增 Proxy Host：
+
+```text
+Domain Names: globalpilot.attodigitalhk.com
+Scheme: http
+Forward Hostname / IP: VM 地址或 FRP 暴露给 NPM 的地址
+Forward Port: 3000
+Websockets Support: On
+SSL: Request a new SSL Certificate
+Force SSL: On
+HTTP/2 Support: On
+```
+
+如果 NPM 和网站容器在同一台机器，`.env.production` 中保持 `APP_BIND=127.0.0.1`。如果 NPM 在另一台机器，需要让 NPM 能访问 VM 的 `APP_PORT`，通常将 `APP_BIND` 改成 `0.0.0.0`，再用防火墙或 FRP 限制来源。
+
 ## Mac mini Ollama + Qwen + Telegram
 
 复制环境变量模板：
