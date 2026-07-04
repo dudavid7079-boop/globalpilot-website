@@ -1,9 +1,9 @@
 [Unit]
-Description=Run GlobalPilot auto deploy every minute
+Description=Run GlobalPilot auto deploy every 5 minutes
 
 [Timer]
 OnBootSec=2min
-OnUnitActiveSec=1min
+OnUnitActiveSec=5min
 AccuracySec=15s
 Persistent=true
 Unit=globalpilot-auto-deploy.service
