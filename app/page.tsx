@@ -5,6 +5,17 @@ import { services } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 
 const workflow = ["Obsidian 写作", "GitHub 同步", "VM / NPM 发布", "AI Chat 接入 Telegram"];
+const proof = [
+  ["Live stack", "Next.js · VM · NPM · Docker"],
+  ["Local AI", "Mac mini · Ollama · Qwen"],
+  ["Publishing", "Obsidian · GitHub · Auto deploy"],
+  ["Lead flow", "AI Chat · Telegram alerts"],
+];
+const paths = [
+  { title: "我想做一个 AI 官网", text: "从品牌表达、Blog、SEO 到 AI Chat，一次搭好长期运营底座。", href: "/services/ai-website-builder" },
+  { title: "我想自动化业务流程", text: "把重复沟通、内容整理、通知和 AI 工作流串成稳定系统。", href: "/services/ai-automation" },
+  { title: "我想了解这个网站怎么搭的", text: "阅读 GlobalPilot 建站复盘，看完整架构和取舍。", href: "/blog/globalpilot-build-review" },
+];
 
 export default function Home() {
   const posts = getAllPosts();
@@ -15,7 +26,7 @@ export default function Home() {
           <div className="status"><i /> Independent builder · Based in Shanghai</div>
           <h1>Make ideas<br/><em>travel further.</em></h1>
           <p className="hero-intro">我是 Justin，专注 AI 产品、自动化与全球增长。GlobalPilot 是我的个人品牌与实验室：把内容、工具和真实业务线放到一个可以持续发布的网站里。</p>
-          <div className="hero-actions"><Link className="button dark" href="/chat">Talk to AI <span>→</span></Link><a className="text-link" href="#services">Explore services ↓</a></div>
+          <div className="hero-actions"><Link className="button dark" href="/services">Explore services <span>→</span></Link><Link className="text-link" href="/chat">Talk to AI concierge ↗</Link></div>
         </div>
         <div className="orbit" aria-label="GlobalPilot 抽象地球图形">
           <div className="orbit-ring ring-one"/><div className="orbit-ring ring-two"/>
@@ -26,6 +37,15 @@ export default function Home() {
       </section>
 
       <section className="ticker" aria-label="关注领域"><span>AI PRODUCTS</span><b>✦</b><span>AUTOMATION</span><b>✦</b><span>GLOBAL GROWTH</span><b>✦</b><span>BUILDING IN PUBLIC</span></section>
+
+      <section className="proof-strip" aria-label="GlobalPilot 当前系统状态">
+        {proof.map(([label, value]) => (
+          <div key={label}>
+            <span>{label}</span>
+            <strong>{value}</strong>
+          </div>
+        ))}
+      </section>
 
       <section className="section services" id="services">
         <div className="section-heading">
@@ -46,16 +66,32 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section pathways">
+        <div className="section-heading">
+          <div><span className="kicker">02 / START HERE</span><h2>Choose the door<br/>closest to your problem.</h2></div>
+          <Link href="/about">About Justin <span>↗</span></Link>
+        </div>
+        <div className="pathway-grid">
+          {paths.map((path) => (
+            <Link className="pathway-card" href={path.href} key={path.title}>
+              <h3>{path.title}</h3>
+              <p>{path.text}</p>
+              <span>Open path ↗</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="section notes">
-        <div className="section-heading"><div><span className="kicker">02 / FIELD NOTES</span><h2>Latest thinking,<br/>fresh from the workbench.</h2></div><Link href="/blog">View all articles <span>↗</span></Link></div>
+        <div className="section-heading"><div><span className="kicker">03 / FIELD NOTES</span><h2>Latest thinking,<br/>fresh from the workbench.</h2></div><Link href="/blog">View all articles <span>↗</span></Link></div>
         <div className="article-grid"><ArticleCard post={posts[0]} featured />{posts.slice(1, 3).map((post) => <ArticleCard key={post.slug} post={post} />)}</div>
       </section>
 
       <section className="about" id="about">
-        <span className="kicker">03 / ABOUT</span>
+        <span className="kicker">04 / ABOUT</span>
         <div className="about-grid">
           <h2>Builder by instinct.<br/><em>Explorer by choice.</em></h2>
-          <div><p>我喜欢把复杂技术变成简单产品，也相信最好的增长来自真正解决问题。</p><p>GlobalPilot 是我的数字工作台：关于 AI、独立开发与中国创意如何走向全球。这里的每篇文章、每个工具入口，都服务于一个目标：让想法更快被验证。</p><a href={`mailto:${siteConfig.email}`} className="button orange">Start a conversation <span>↗</span></a></div>
+          <div><p>我喜欢把复杂技术变成简单产品，也相信最好的增长来自真正解决问题。</p><p>GlobalPilot 是我的数字工作台：关于 AI、独立开发与中国创意如何走向全球。这里的每篇文章、每个工具入口，都服务于一个目标：让想法更快被验证。</p><Link href="/about" className="button orange">More about me <span>↗</span></Link></div>
         </div>
         <div className="principles"><div><b>01</b><span>Think clearly</span></div><div><b>02</b><span>Build quickly</span></div><div><b>03</b><span>Share openly</span></div></div>
       </section>
