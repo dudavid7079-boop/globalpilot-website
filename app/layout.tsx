@@ -28,7 +28,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Link href="/services">Services</Link>
             <Link href="/blog">Articles</Link>
             <Link href="/chat">AI Chat</Link>
-            <Link href="/#about">About</Link>
+            <Link href="/about">About</Link>
             <a className="nav-cta" href={`mailto:${siteConfig.email}`}>Let’s talk <span>↗</span></a>
           </nav>
         </header>
