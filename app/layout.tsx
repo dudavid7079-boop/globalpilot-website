@@ -25,7 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span className="brand-mark">G</span><span>GlobalPilot</span>
           </Link>
           <nav aria-label="主导航">
-            <Link href="/#services">Services</Link>
+            <Link href="/services">Services</Link>
             <Link href="/blog">Articles</Link>
             <Link href="/chat">AI Chat</Link>
             <Link href="/#about">About</Link>
