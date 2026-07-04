@@ -12,7 +12,9 @@ const RATE_LIMIT_MAX_REQUESTS = 12;
 const SYSTEM_PROMPT = `You are GlobalPilot AI, the helpful bilingual concierge for Justin's personal brand website.
 Help visitors clarify product ideas, AI automation opportunities, website strategy, and global growth plans.
 Reply in the user's language. Be concise, practical, candid, and warm. Prefer 2-4 short paragraphs or a small list.
-Do not claim that Justin has agreed to work with the visitor. When human expertise would help, suggest leaving contact details or continuing with Justin.`;
+Do not claim that Justin has agreed to work with the visitor.
+When the visitor shows concrete intent, ask 1-2 practical follow-up questions and invite them to leave an email, Telegram handle, WeChat ID, or preferred contact method so Justin can follow up.
+If they leave contact details, acknowledge it briefly and say Justin can review the context.`;
 
 function validMessages(value: unknown): ChatMessage[] | null {
   if (!Array.isArray(value) || value.length === 0 || value.length > 12) return null;
@@ -48,11 +50,66 @@ function cleanModelOutput(value: string) {
     .trim();
 }
 
-async function notifyTelegram(sessionId: string, userMessage: string, aiMessage: string) {
+function detectContact(text: string) {
+  const email = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0];
+  const telegram = text.match(/@[a-zA-Z0-9_]{5,}/)?.[0];
+  const wechat = text.match(/(?:微信|wechat|weixin|wx)[:：\s]*([a-zA-Z][-_a-zA-Z0-9]{5,19})/i)?.[1];
+  const phone = text.match(/(?:\+?\d[\d\s().-]{7,}\d)/)?.[0];
+  return { email, telegram, wechat, phone };
+}
+
+function intentScore(messages: ChatMessage[]) {
+  const text = messages.map((message) => message.content).join("\n").toLowerCase();
+  let score = 0;
+  if (/(预算|报价|价格|多少钱|quote|price|budget)/i.test(text)) score += 2;
+  if (/(合作|咨询|联系|预约|demo|call|meeting|consult|hire|work together)/i.test(text)) score += 2;
+  if (/(官网|网站|自动化|agent|dify|n8n|seo|出海|获客|telegram|ollama)/i.test(text)) score += 1;
+  if (Object.values(detectContact(text)).some(Boolean)) score += 3;
+  if (messages.filter((message) => message.role === "user").length >= 3) score += 1;
+  return score;
+}
+
+function leadLabel(score: number) {
+  if (score >= 5) return "HOT LEAD";
+  if (score >= 3) return "WARM LEAD";
+  return "CHAT";
+}
+
+function compactTranscript(messages: ChatMessage[]) {
+  return messages
+    .slice(-6)
+    .map((message) => `${message.role === "user" ? "Visitor" : "AI"}: ${message.content}`)
+    .join("\n")
+    .slice(0, 1800);
+}
+
+async function notifyTelegram(sessionId: string, messages: ChatMessage[], userMessage: string, aiMessage: string) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) return;
-  const text = [`✦ GlobalPilot website chat`, `Session: ${sessionId.slice(0, 12)}`, ``, `Visitor:`, userMessage, ``, `AI:`, aiMessage].join("\n").slice(0, 4000);
+  const score = intentScore(messages);
+  const contact = detectContact(messages.map((message) => message.content).join("\n"));
+  const contactLines = [
+    contact.email && `Email: ${contact.email}`,
+    contact.telegram && `Telegram: ${contact.telegram}`,
+    contact.wechat && `WeChat: ${contact.wechat}`,
+    contact.phone && `Phone: ${contact.phone}`,
+  ].filter(Boolean);
+  const text = [
+    `✦ GlobalPilot ${leadLabel(score)}`,
+    `Session: ${sessionId.slice(0, 12)}`,
+    `Score: ${score}`,
+    contactLines.length ? `Contact:\n${contactLines.join("\n")}` : `Contact: not provided`,
+    ``,
+    `Latest visitor message:`,
+    userMessage,
+    ``,
+    `AI reply:`,
+    aiMessage,
+    ``,
+    `Recent context:`,
+    compactTranscript(messages),
+  ].join("\n").slice(0, 4000);
   const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -95,7 +152,7 @@ export async function POST(request: Request) {
     if (!message) return NextResponse.json({ error: "AI 返回了空内容" }, { status: 502 });
 
     const latestUserMessage = [...messages].reverse().find((item) => item.role === "user")?.content || "";
-    await notifyTelegram(sessionId, latestUserMessage, message).catch((error) => console.error("Telegram sync error", error));
+    await notifyTelegram(sessionId, messages, latestUserMessage, message).catch((error) => console.error("Telegram sync error", error));
     return NextResponse.json({ message });
   } catch (error) {
     console.error("Chat request failed", error);

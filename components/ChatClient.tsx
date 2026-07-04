@@ -5,6 +5,10 @@ import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 type Message = { role: "user" | "assistant"; content: string };
 
 const starters = ["帮我评估一个 AI 产品想法", "如何让产品进入海外市场？", "我想自动化一个重复流程"];
+const conversionPrompts = [
+  "请帮我整理一份给 Justin 的需求摘要",
+  "我想留下联系方式，请告诉我需要提供什么",
+];
 
 export default function ChatClient() {
   const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: "你好，我是 GlobalPilot AI。你正在构建什么？给我一点背景，我们一起把下一步想清楚。" }]);
@@ -64,11 +68,16 @@ export default function ChatClient() {
           </div>
         ))}
         {messages.length === 1 && <div className="chat-starters">{starters.map((starter) => <button onClick={() => void sendMessage(starter)} key={starter}>{starter}<span>↗</span></button>)}</div>}
+        {messages.filter((message) => message.role === "user").length >= 2 && !loading && (
+          <div className="chat-starters compact">
+            {conversionPrompts.map((prompt) => <button onClick={() => void sendMessage(prompt)} key={prompt}>{prompt}<span>→</span></button>)}
+          </div>
+        )}
         {loading && <div className="message assistant typing"><span className="message-label">GP / THINKING</span><p><i/><i/><i/></p></div>}
       </div>
       {error && <div className="chat-error" role="alert">{error}</div>}
       <form className="chat-composer" onSubmit={submit}>
-        <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} maxLength={2000} rows={2} placeholder="说说你的想法…" aria-label="输入消息" disabled={loading}/>
+        <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} maxLength={2000} rows={2} placeholder="说说你的想法，或留下邮箱 / Telegram / 微信…" aria-label="输入消息" disabled={loading}/>
         <button type="submit" disabled={!input.trim() || loading} aria-label="发送消息">↑</button>
         <small>ENTER TO SEND · SHIFT + ENTER FOR NEW LINE</small>
       </form>
