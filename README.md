@@ -113,6 +113,8 @@ HTTP/2 Support: On
 
 自动部署与 Mac mini Ollama 开机自启见 [`deploy/AUTOMATION.md`](deploy/AUTOMATION.md)。
 
+访问统计推荐使用自托管 Umami，部署方式见 [`deploy/UMAMI.md`](deploy/UMAMI.md)。
+
 ## Mac mini Ollama + Qwen + Telegram
 
 复制环境变量模板：

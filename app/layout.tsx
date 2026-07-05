@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
 
@@ -17,9 +18,19 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const umamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL;
+  const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+
   return (
     <html lang="zh-CN">
       <body>
+        {umamiScriptUrl && umamiWebsiteId && (
+          <Script
+            src={umamiScriptUrl}
+            data-website-id={umamiWebsiteId}
+            strategy="afterInteractive"
+          />
+        )}
         <header className="site-header">
           <Link className="brand" href="/" aria-label="GlobalPilot 首页">
             <span className="brand-mark">G</span><span>GlobalPilot</span>
