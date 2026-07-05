@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import TrackedLink from "@/components/TrackedLink";
 import { getAllPosts, getPost } from "@/lib/posts";
 import { siteConfig } from "@/lib/site";
 import type { Metadata } from "next";
@@ -31,7 +32,15 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <header className="post-header"><div className="post-tags">{post.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><h1>{post.title}</h1><p>{post.description}</p><div className="meta"><time>{post.date}</time><span>{post.readTime} read</span></div></header>
       <div className="post-divider"><span>✦</span></div>
       <div className="prose" dangerouslySetInnerHTML={{ __html: post.content! }}/>
-      <div className="post-end"><span>END NOTE</span><h3>Keep building.</h3><Link href="/blog">Read the next idea →</Link></div>
+      <div className="post-end">
+        <span>END NOTE</span>
+        <h3>Turn the idea<br/>into a working system.</h3>
+        <p>如果这篇文章正好对应你的问题，可以让 GlobalPilot AI 先帮你梳理需求；我会在 Telegram 后台看到上下文，再判断下一步怎么做最省力。</p>
+        <div className="post-end-actions">
+          <TrackedLink href="/chat" className="button light" eventName="cta_click" eventData={{ location: "post_end", action: "chat", slug: post.slug }}>Ask GlobalPilot AI <span>→</span></TrackedLink>
+          <TrackedLink href="/blog" eventName="post_next_click" eventData={{ slug: post.slug }}>Read the next idea ↗</TrackedLink>
+        </div>
+      </div>
     </article>
   </main>;
 }
