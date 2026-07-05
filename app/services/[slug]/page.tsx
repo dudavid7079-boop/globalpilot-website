@@ -74,6 +74,22 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </div>
       </section>
 
+      <section className="service-example">
+        <div>
+          <span className="kicker">EXAMPLE ENGAGEMENT</span>
+          <h2>{service.example.title}</h2>
+          <p>{service.example.scenario}</p>
+        </div>
+        <div className="example-assets">
+          <span className="kicker">WHAT YOU WALK AWAY WITH</span>
+          <ul>{service.example.assets.map((asset) => <li key={asset}>{asset}</li>)}</ul>
+          <div className="first-step">
+            <b>First useful step</b>
+            <p>{service.example.firstStep}</p>
+          </div>
+        </div>
+      </section>
+
       <section className="service-cta compact">
         <span className="kicker">NEXT STEP</span>
         <h2>Bring a messy idea.<br/>We will make it operational.</h2>
