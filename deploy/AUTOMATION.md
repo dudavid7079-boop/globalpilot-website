@@ -5,7 +5,7 @@
 你的 SSH 入口通过 FRP 暴露。MacBook 可以访问，但 GitHub-hosted runner 可能无法访问这个 FRP 端口。推荐使用“VM 主动拉取”的方式：
 
 ```text
-Obsidian / MacBook → GitHub main → VM 每分钟检查更新 → 自动 git pull + Docker rebuild
+Obsidian / MacBook → GitHub main → VM 每 5 分钟检查更新 → 自动 git pull + Docker rebuild
 ```
 
 这条链路不需要 GitHub 从公网 SSH 进入 VM，更适合 FRP/NPM 架构。
@@ -43,7 +43,7 @@ systemctl list-timers globalpilot-auto-deploy.timer --no-pager
 journalctl -u globalpilot-auto-deploy.service -n 100 --no-pager
 ```
 
-以后每次 `main` 有更新，VM 会在 1 分钟左右自动部署。
+以后每次 `main` 有更新，VM 会在 5 分钟左右自动部署。
 
 ## 2. 可选：GitHub Actions SSH 部署
 

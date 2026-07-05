@@ -2,6 +2,12 @@
 
 个人品牌与内容网站，使用 Next.js + Markdown 构建。
 
+## 项目手册
+
+当前生产环境、日常发布、VM 运维、Ollama、Telegram、Umami 和排障操作见：
+
+[`docs/OPERATION_MANUAL.md`](docs/OPERATION_MANUAL.md)
+
 ## 本地运行
 
 ```bash
