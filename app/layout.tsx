@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import "./globals.css";
+import TrackedLink from "@/components/TrackedLink";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -36,11 +37,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span className="brand-mark">G</span><span>GlobalPilot</span>
           </Link>
           <nav aria-label="主导航">
-            <Link href="/services">Services</Link>
-            <Link href="/blog">Articles</Link>
-            <Link href="/chat">AI Chat</Link>
-            <Link href="/about">About</Link>
-            <a className="nav-cta" href={`mailto:${siteConfig.email}`}>Let’s talk <span>↗</span></a>
+            <TrackedLink href="/services" eventName="nav_click" eventData={{ item: "services" }}>Services</TrackedLink>
+            <TrackedLink href="/blog" eventName="nav_click" eventData={{ item: "articles" }}>Articles</TrackedLink>
+            <TrackedLink href="/chat" eventName="nav_click" eventData={{ item: "ai_chat" }}>AI Chat</TrackedLink>
+            <TrackedLink href="/about" eventName="nav_click" eventData={{ item: "about" }}>About</TrackedLink>
+            <TrackedLink className="nav-cta" href={`mailto:${siteConfig.email}`} eventName="cta_click" eventData={{ location: "nav", action: "email" }}>Let’s talk <span>↗</span></TrackedLink>
           </nav>
         </header>
         {children}

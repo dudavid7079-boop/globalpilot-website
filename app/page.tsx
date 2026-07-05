@@ -1,5 +1,5 @@
-import Link from "next/link";
 import ArticleCard from "@/components/ArticleCard";
+import TrackedLink from "@/components/TrackedLink";
 import { getAllPosts } from "@/lib/posts";
 import { services } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
@@ -26,7 +26,10 @@ export default function Home() {
           <div className="status"><i /> Independent builder · Based in Shanghai</div>
           <h1>Make ideas<br/><em>travel further.</em></h1>
           <p className="hero-intro">我是 Justin，专注 AI 产品、自动化与全球增长。GlobalPilot 是我的个人品牌与实验室：把内容、工具和真实业务线放到一个可以持续发布的网站里。</p>
-          <div className="hero-actions"><Link className="button dark" href="/services">Explore services <span>→</span></Link><Link className="text-link" href="/chat">Talk to AI concierge ↗</Link></div>
+          <div className="hero-actions">
+            <TrackedLink className="button dark" href="/services" eventName="cta_click" eventData={{ location: "home_hero", action: "services" }}>Explore services <span>→</span></TrackedLink>
+            <TrackedLink className="text-link" href="/chat" eventName="cta_click" eventData={{ location: "home_hero", action: "chat" }}>Talk to AI concierge ↗</TrackedLink>
+          </div>
         </div>
         <div className="orbit" aria-label="GlobalPilot 抽象地球图形">
           <div className="orbit-ring ring-one"/><div className="orbit-ring ring-two"/>
@@ -50,15 +53,15 @@ export default function Home() {
       <section className="section services" id="services">
         <div className="section-heading">
           <div><span className="kicker">01 / WHAT I BUILD</span><h2>From fuzzy idea<br/>to working system.</h2></div>
-          <Link href="/services">View services <span>↗</span></Link>
+          <TrackedLink href="/services" eventName="section_link_click" eventData={{ location: "home_services", action: "view_all" }}>View services <span>↗</span></TrackedLink>
         </div>
         <div className="offer-grid">
           {services.map((offer, index) => (
-            <Link className="offer-card" href={`/services/${offer.slug}`} key={offer.label}>
+            <TrackedLink className="offer-card" href={`/services/${offer.slug}`} eventName="service_card_click" eventData={{ location: "home_offer_grid", service: offer.slug }} key={offer.label}>
               <span>{String(index + 1).padStart(2, "0")} · {offer.label}</span>
               <h3>{offer.title}</h3>
               <p>{offer.description}</p>
-            </Link>
+            </TrackedLink>
           ))}
         </div>
         <div className="workflow-strip" aria-label="内容发布与咨询转化流程">
@@ -69,21 +72,21 @@ export default function Home() {
       <section className="section pathways">
         <div className="section-heading">
           <div><span className="kicker">02 / START HERE</span><h2>Choose the door<br/>closest to your problem.</h2></div>
-          <Link href="/about">About Justin <span>↗</span></Link>
+          <TrackedLink href="/about" eventName="section_link_click" eventData={{ location: "home_pathways", action: "about" }}>About Justin <span>↗</span></TrackedLink>
         </div>
         <div className="pathway-grid">
           {paths.map((path) => (
-            <Link className="pathway-card" href={path.href} key={path.title}>
+            <TrackedLink className="pathway-card" href={path.href} eventName="pathway_click" eventData={{ location: "home_pathways", title: path.title }} key={path.title}>
               <h3>{path.title}</h3>
               <p>{path.text}</p>
               <span>Open path ↗</span>
-            </Link>
+            </TrackedLink>
           ))}
         </div>
       </section>
 
       <section className="section notes">
-        <div className="section-heading"><div><span className="kicker">03 / FIELD NOTES</span><h2>Latest thinking,<br/>fresh from the workbench.</h2></div><Link href="/blog">View all articles <span>↗</span></Link></div>
+        <div className="section-heading"><div><span className="kicker">03 / FIELD NOTES</span><h2>Latest thinking,<br/>fresh from the workbench.</h2></div><TrackedLink href="/blog" eventName="section_link_click" eventData={{ location: "home_notes", action: "blog" }}>View all articles <span>↗</span></TrackedLink></div>
         <div className="article-grid"><ArticleCard post={posts[0]} featured />{posts.slice(1, 3).map((post) => <ArticleCard key={post.slug} post={post} />)}</div>
       </section>
 
@@ -91,12 +94,12 @@ export default function Home() {
         <span className="kicker">04 / ABOUT</span>
         <div className="about-grid">
           <h2>Builder by instinct.<br/><em>Explorer by choice.</em></h2>
-          <div><p>我喜欢把复杂技术变成简单产品，也相信最好的增长来自真正解决问题。</p><p>GlobalPilot 是我的数字工作台：关于 AI、独立开发与中国创意如何走向全球。这里的每篇文章、每个工具入口，都服务于一个目标：让想法更快被验证。</p><Link href="/about" className="button orange">More about me <span>↗</span></Link></div>
+          <div><p>我喜欢把复杂技术变成简单产品，也相信最好的增长来自真正解决问题。</p><p>GlobalPilot 是我的数字工作台：关于 AI、独立开发与中国创意如何走向全球。这里的每篇文章、每个工具入口，都服务于一个目标：让想法更快被验证。</p><TrackedLink href="/about" className="button orange" eventName="cta_click" eventData={{ location: "home_about", action: "about" }}>More about me <span>↗</span></TrackedLink></div>
         </div>
         <div className="principles"><div><b>01</b><span>Think clearly</span></div><div><b>02</b><span>Build quickly</span></div><div><b>03</b><span>Share openly</span></div></div>
       </section>
 
-      <section className="newsletter"><span className="kicker">READY TO SHIP?</span><h2>Good ideas need a runway.</h2><p>如果你正在做 AI 产品、官网、自动化或出海获客，我们可以从一次简短诊断开始。</p><div className="cta-pair"><Link href="/chat" className="button light">Ask GlobalPilot AI <span>→</span></Link><a href={`mailto:${siteConfig.email}?subject=GlobalPilot consultation`} className="button light ghost">Email Justin <span>↗</span></a></div></section>
+      <section className="newsletter"><span className="kicker">READY TO SHIP?</span><h2>Good ideas need a runway.</h2><p>如果你正在做 AI 产品、官网、自动化或出海获客，我们可以从一次简短诊断开始。</p><div className="cta-pair"><TrackedLink href="/chat" className="button light" eventName="cta_click" eventData={{ location: "home_footer_cta", action: "chat" }}>Ask GlobalPilot AI <span>→</span></TrackedLink><TrackedLink href={`mailto:${siteConfig.email}?subject=GlobalPilot consultation`} className="button light ghost" eventName="cta_click" eventData={{ location: "home_footer_cta", action: "email" }}>Email Justin <span>↗</span></TrackedLink></div></section>
     </main>
   );
 }

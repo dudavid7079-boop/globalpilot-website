@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import TrackedLink from "@/components/TrackedLink";
 import { siteConfig } from "@/lib/site";
 
 const stack = ["Next.js", "Obsidian", "GitHub", "Docker", "Nginx Proxy Manager", "Ollama", "Qwen", "Telegram", "Tailscale", "n8n / Dify"];
@@ -70,8 +70,8 @@ export default function AboutPage() {
         <h2>Bring the messy version.<br/>That is usually enough.</h2>
         <p>如果你正在做网站、AI 自动化或出海获客，可以先用 GlobalPilot AI 梳理想法；如果值得继续，我会在 Telegram 后台看到上下文。</p>
         <div className="cta-pair">
-          <Link className="button dark" href="/chat">Talk to GlobalPilot AI <span>→</span></Link>
-          <a className="button orange" href={`mailto:${siteConfig.email}?subject=About GlobalPilot`}>Email Justin <span>↗</span></a>
+          <TrackedLink className="button dark" href="/chat" eventName="cta_click" eventData={{ location: "about_cta", action: "chat" }}>Talk to GlobalPilot AI <span>→</span></TrackedLink>
+          <TrackedLink className="button orange" href={`mailto:${siteConfig.email}?subject=About GlobalPilot`} eventName="cta_click" eventData={{ location: "about_cta", action: "email" }}>Email Justin <span>↗</span></TrackedLink>
         </div>
       </section>
     </main>

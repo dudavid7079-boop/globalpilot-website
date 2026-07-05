@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import TrackedLink from "@/components/TrackedLink";
 import { services } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 
@@ -26,7 +26,7 @@ export default function ServicesPage() {
               <h2>{service.title}</h2>
             </div>
             <p>{service.description}</p>
-            <Link href={`/services/${service.slug}`}>Explore <span>↗</span></Link>
+            <TrackedLink href={`/services/${service.slug}`} eventName="service_list_click" eventData={{ service: service.slug }}>Explore <span>↗</span></TrackedLink>
           </article>
         ))}
       </section>
@@ -36,8 +36,8 @@ export default function ServicesPage() {
         <h2>Let the first conversation<br/>find the shape.</h2>
         <p>如果你还不确定需要官网、自动化还是增长策略，可以先用 AI Chat 做一次快速诊断。</p>
         <div className="cta-pair">
-          <Link className="button dark" href="/chat">Start with AI <span>→</span></Link>
-          <a className="button orange" href={`mailto:${siteConfig.email}?subject=GlobalPilot services`}>Email Justin <span>↗</span></a>
+          <TrackedLink className="button dark" href="/chat" eventName="cta_click" eventData={{ location: "services_cta", action: "chat" }}>Start with AI <span>→</span></TrackedLink>
+          <TrackedLink className="button orange" href={`mailto:${siteConfig.email}?subject=GlobalPilot services`} eventName="cta_click" eventData={{ location: "services_cta", action: "email" }}>Email Justin <span>↗</span></TrackedLink>
         </div>
       </section>
     </main>

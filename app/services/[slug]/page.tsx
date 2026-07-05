@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import TrackedLink from "@/components/TrackedLink";
 import { getService, services } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
 
@@ -95,8 +96,8 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         <h2>Bring a messy idea.<br/>We will make it operational.</h2>
         <p>用 AI Chat 简单说一下你的业务、目标和卡点；如果适合继续合作，我会在 Telegram 后台收到线索并跟进。</p>
         <div className="cta-pair">
-          <Link className="button dark" href="/chat">Talk to GlobalPilot AI <span>→</span></Link>
-          <a className="button orange" href={`mailto:${siteConfig.email}?subject=${encodeURIComponent(service.shortTitle)}`}>Email Justin <span>↗</span></a>
+          <TrackedLink className="button dark" href="/chat" eventName="cta_click" eventData={{ location: "service_detail_cta", action: "chat", service: service.slug }}>Talk to GlobalPilot AI <span>→</span></TrackedLink>
+          <TrackedLink className="button orange" href={`mailto:${siteConfig.email}?subject=${encodeURIComponent(service.shortTitle)}`} eventName="cta_click" eventData={{ location: "service_detail_cta", action: "email", service: service.slug }}>Email Justin <span>↗</span></TrackedLink>
         </div>
       </section>
     </main>

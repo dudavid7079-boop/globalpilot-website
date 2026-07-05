@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { trackEvent } from "@/components/TrackedLink";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -25,10 +26,16 @@ export default function ChatClient() {
 
   useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" }); }, [messages, loading]);
 
-  async function sendMessage(text: string) {
+  function hasContactIntent(text: string) {
+    return /(@[\w_]{4,}|微信|wechat|weixin|wx|邮箱|email|电话|phone|telegram|联系|预约|咨询|合作|报价)/i.test(text);
+  }
+
+  async function sendMessage(text: string, source: "composer" | "starter" | "conversion_prompt" = "composer") {
     const clean = text.trim();
     if (!clean || loading) return;
     const nextMessages: Message[] = [...messages, { role: "user", content: clean }];
+    trackEvent("chat_message_sent", { source, message_count: nextMessages.length });
+    if (hasContactIntent(clean)) trackEvent("chat_contact_intent", { source });
     setMessages(nextMessages);
     setInput("");
     setError("");
@@ -42,8 +49,10 @@ export default function ChatClient() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "暂时无法连接 AI");
+      trackEvent("chat_response_received", { source });
       setMessages((current) => [...current, { role: "assistant", content: data.message }]);
     } catch (cause) {
+      trackEvent("chat_error", { source });
       setError(cause instanceof Error ? cause.message : "连接失败，请稍后重试");
     } finally { setLoading(false); }
   }
@@ -67,10 +76,10 @@ export default function ChatClient() {
             <p>{message.content}</p>
           </div>
         ))}
-        {messages.length === 1 && <div className="chat-starters">{starters.map((starter) => <button onClick={() => void sendMessage(starter)} key={starter}>{starter}<span>↗</span></button>)}</div>}
+        {messages.length === 1 && <div className="chat-starters">{starters.map((starter) => <button onClick={() => void sendMessage(starter, "starter")} key={starter}>{starter}<span>↗</span></button>)}</div>}
         {messages.filter((message) => message.role === "user").length >= 2 && !loading && (
           <div className="chat-starters compact">
-            {conversionPrompts.map((prompt) => <button onClick={() => void sendMessage(prompt)} key={prompt}>{prompt}<span>→</span></button>)}
+            {conversionPrompts.map((prompt) => <button onClick={() => void sendMessage(prompt, "conversion_prompt")} key={prompt}>{prompt}<span>→</span></button>)}
           </div>
         )}
         {loading && <div className="message assistant typing"><span className="message-label">GP / THINKING</span><p><i/><i/><i/></p></div>}
