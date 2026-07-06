@@ -3,7 +3,7 @@ set -eu
 
 APP_PORT="${APP_PORT:-3000}"
 
-docker compose -f compose.npm.yml --env-file .env.production up -d --build --remove-orphans
+docker compose -f compose.npm.yml --env-file .env.production up -d --build
 docker compose -f compose.npm.yml --env-file .env.production ps
 
 for attempt in $(seq 1 30); do

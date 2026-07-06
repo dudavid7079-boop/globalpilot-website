@@ -273,6 +273,8 @@ cd /opt/globalpilot
 docker compose -f compose.npm.yml --env-file .env.production up -d --build app
 ```
 
+注意：不要在主站部署命令里加 `--remove-orphans`。Umami 和主站当前共用同一个目录项目名，主站 Compose 会把 Umami 容器识别成 orphan；如果清理 orphan，会导致 `analytics.globalpilot.attodigitalhk.com` 变成 504。
+
 ### 6.4 自动部署 timer
 
 查看 timer：
@@ -654,4 +656,3 @@ https://globalpilot.attodigitalhk.com/
 3. 给核心文章增加底部 CTA，例如“用 AI 诊断我的网站”。
 4. 增加案例页或项目页，把 GlobalPilot 网站本身作为第一个案例。
 5. 建立每周内容节奏：每周 1 篇 SEO/GEO 文章，每月复盘一次数据。
-
