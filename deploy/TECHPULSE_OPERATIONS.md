@@ -69,6 +69,8 @@ youtube-ai-tech-aggregator/pipeline/run-real-preview.mjs
 youtube-ai-tech-aggregator/npm run prelaunch
 ```
 
+The VM does not need host Node.js installed. If `node` and `npm` are not available on the host, the script runs the same commands inside `node:22-alpine` with Docker.
+
 It updates:
 
 ```text
@@ -78,6 +80,15 @@ youtube-ai-tech-aggregator/pipeline/daily-digest.real.json
 ```
 
 Because TechPulse is mounted into the static container from the host directory, no container restart is required after the JSON/JS data refresh.
+
+If the service fails with Docker permission errors, make sure the service file was copied again after pulling latest code and then reload systemd:
+
+```bash
+sudo cp deploy/systemd/techpulse-refresh.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl reset-failed techpulse-refresh.service
+sudo systemctl start techpulse-refresh.service
+```
 
 ## 3. Launch Verification
 
