@@ -39,7 +39,7 @@ function renderPipelineStatus(jobStatus, channelTests) {
   const sourceLabel = window.TechPulseDataSource === "generated" ? "Pipeline 生成数据" : "Demo 演示数据";
   const modeLabel = jobStatus?.mode === "youtube-api" ? "YouTube API 精准指标" : jobStatus?.mode === "estimated" ? "估算预览指标" : "静态数据";
   const refreshedAt = jobStatus?.finishedAt || window.TechPulseData.generatedAt;
-  const channelHealth = channelTests ? `${channelTests.okCount}/${channelTests.count} 频道通过` : "频道健康未测试";
+  const channelHealth = channelTests ? `${channelTests.okCount}/${channelTests.count} 来源可用` : "来源持续巡检";
   const failedCount = channelTests ? Math.max(0, channelTests.count - channelTests.okCount) : 0;
 
   pipelineStatus.innerHTML = `
@@ -49,13 +49,13 @@ function renderPipelineStatus(jobStatus, channelTests) {
       <p>${modeLabel} · 最近刷新 ${formatDateTime(refreshedAt)}</p>
     </div>
     <div class="home-status-metrics">
-      <a href="./admin.html?source=${window.TechPulseDataSource}">
+      <a href="./topics.html?source=${window.TechPulseDataSource}">
         <b>${jobStatus?.topicCount || videos.length}</b>
         <span>热榜话题</span>
       </a>
       <a href="./channels.html?source=${window.TechPulseDataSource}">
         <b>${channelHealth}</b>
-        <span>${failedCount ? `${failedCount} 个需检查` : "频道健康"}</span>
+        <span>${failedCount ? "部分来源等待更新" : "来源状态"}</span>
       </a>
     </div>
   `;

@@ -51,7 +51,7 @@ form.addEventListener("submit", (event) => {
       digestTime: digestTime.value,
     })
   );
-  notice.textContent = "已保存到当前浏览器。下一步接用户账号后，这里会同步到服务端订阅表。";
+  notice.textContent = "订阅偏好已保存，可在“我的账户”查看。";
 });
 
 loadPreferences();

@@ -51,7 +51,7 @@ function reasonCopy(reason = "") {
   if (reason === "pro-waitlist") return "注册后会自动加入 Pro 等待名单，并返回会员页。";
   if (reason === "team-waitlist") return "注册后会自动加入 Team 等待名单，并返回会员页。";
   if (reason.includes("subscribe")) return "注册后即可保存频道、关键词和推送偏好。";
-  return "当前 MVP 使用本地浏览器模拟注册状态，后续接真实用户系统。";
+  return "免费注册后，可保存订阅偏好、会员等待名单和阅读进度。";
 }
 
 function renderAuthNav() {
