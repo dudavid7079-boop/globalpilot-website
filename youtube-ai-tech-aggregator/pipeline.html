@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>聚合引擎 - TechPulse</title>
+    <title>算法 - TechPulse</title>
     <meta name="description" content="TechPulse 的 RSS 发现、YouTube API 同步、热度评分、AI 话题聚类和摘要生成技术方案。" />
     <link rel="icon" href="./assets/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="./assets/favicon.png" />
@@ -29,8 +29,8 @@
         <a href="./index.html#hot">Top 20</a>
         <a href="./search.html">搜索</a>
         <a href="./topics.html">话题库</a>
-        <a href="./channels.html">频道库</a>
-        <a href="./pipeline.html">聚合引擎</a>
+        <a href="./channels.html">来源</a>
+        <a href="./pipeline.html">算法</a>
         <a href="./pricing.html">会员</a>
         <a class="nav-cta" href="./subscribe.html">订阅</a>
       </nav>
@@ -39,15 +39,15 @@
     <main>
       <section class="page-hero">
         <span class="section-label">Aggregation Blueprint</span>
-        <h1>从频道池到每日 Top 20 的自动化生产线</h1>
+        <h1>从来源池到每日 Top 20 的自动化生产线</h1>
         <p>这页把网站背后的内容工程拆开：哪些任务低成本跑、哪些任务消耗 API 配额、哪些任务交给大模型，以及哪些结果需要人工审核。</p>
       </section>
 
       <section class="engine-map">
         <article>
           <span>01</span>
-          <h2>频道池</h2>
-          <p>维护 50-100 个 Channel ID，按 AI 官方、研究者、科技媒体、数码评测、开发者频道分组，并给核心频道更高权重。</p>
+          <h2>来源</h2>
+          <p>维护 50-100 个高质量来源，按 AI 官方、研究者、科技媒体、数码评测、开发者频道分组，并给核心来源更高优先级。</p>
           <code>channels.json</code>
         </article>
         <article>
@@ -88,7 +88,7 @@
           <h2>建议数据库表</h2>
         </div>
         <div class="schema-grid">
-          <article><b>channels</b><p>频道 ID、频道名、分类、权重、状态、RSS URL、最近抓取时间。</p></article>
+          <article><b>channels</b><p>来源名称、分类、优先级、最近同步时间和可用状态。</p></article>
           <article><b>videos</b><p>videoId、频道、标题、简介、发布时间、指标快照、字幕状态。</p></article>
           <article><b>topic_clusters</b><p>中文话题名、主视频、关联视频、AI 聚类理由、审核状态。</p></article>
           <article><b>summaries</b><p>视频摘要、关键时间点、字幕语言、模型版本、生成时间。</p></article>

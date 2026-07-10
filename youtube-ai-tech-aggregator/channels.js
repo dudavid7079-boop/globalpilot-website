@@ -1,73 +1,29 @@
-const draftKey = "techpulse-channel-draft";
 const channelBoard = document.querySelector("#channelBoard");
 const channelSummary = document.querySelector("#channelSummary");
 const categoryFilter = document.querySelector("#categoryFilter");
-const statusFilter = document.querySelector("#statusFilter");
-const healthFilter = document.querySelector("#healthFilter");
 const channelSearch = document.querySelector("#channelSearch");
-const configOutput = document.querySelector("#channelConfigOutput");
-const resetDraftButton = document.querySelector("#resetDraft");
-const copyConfigButton = document.querySelector("#copyConfig");
-const channelAddForm = document.querySelector("#channelAddForm");
-const channelFormMessage = document.querySelector("#channelFormMessage");
-const channelTestSummary = document.querySelector("#channelTestSummary");
+const sourceQuality = document.querySelector("#sourceQuality");
 
 let channels = [];
 let channelTestResults = new Map();
 let channelTestMeta = null;
-
-function readDraft() {
-  try {
-    return JSON.parse(localStorage.getItem(draftKey) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveDraft() {
-  localStorage.setItem(draftKey, JSON.stringify(channels));
-}
 
 function normalizeFromSiteData(channel) {
   return {
     channelId: channel.channelId || channel.name.toLowerCase().replaceAll(" ", "-"),
     name: channel.name,
     category: channel.category || (channel.type?.includes("AI") ? "AI" : channel.type?.includes("评测") ? "Review" : "Platform"),
-    weight: Number(channel.weight || 1),
-    rssUrl: channel.rssUrl || "",
     handle: channel.handle || "",
     webUrl: channel.webUrl || "",
-    status: channel.status || "active",
-  };
-}
-
-function normalizeHandle(handle = "") {
-  const trimmed = handle.trim();
-  if (!trimmed) return "";
-  return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
-}
-
-function channelIdFromFallback(name, handle) {
-  const source = handle || name;
-  return source.toLowerCase().replace(/^@/, "").replace(/[^a-z0-9_-]+/g, "-").replace(/^-|-$/g, "");
-}
-
-function buildChannelUrls(channelId, handle) {
-  return {
-    rssUrl: channelId ? `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}` : "",
-    webUrl: handle ? `https://www.youtube.com/${handle}/videos` : "",
   };
 }
 
 async function loadChannels() {
-  const draft = readDraft();
-  if (draft.length) return draft;
-
   try {
     const response = await fetch("./pipeline/channels.sample.json", { cache: "no-store" });
     if (response.ok) {
       const data = await response.json();
-      return data.map((channel) => ({ ...channel, status: channel.status || "active" }));
+      return data.filter((channel) => (channel.status || "active") === "active");
     }
   } catch {}
 
@@ -88,129 +44,109 @@ async function loadChannelTests() {
   }
 }
 
-function channelType(category) {
-  if (category === "AI") return "AI 科技先锋";
-  if (category === "Review" || category === "Devices") return "综合科技评测";
-  return "平台与开发者科技";
+function sourceType(category) {
+  if (category === "AI") return "AI 官方与研究者";
+  if (category === "Review" || category === "Devices") return "数码与综合科技评测";
+  return "平台与开发者生态";
+}
+
+function categoryLabel(category) {
+  if (category === "AI") return "AI";
+  if (category === "Platform") return "平台生态";
+  if (category === "Devices") return "数码硬件";
+  if (category === "Review") return "科技评测";
+  return category;
 }
 
 function renderCategoryOptions() {
   const categories = [...new Set(channels.map((channel) => channel.category))].sort();
   const selected = categoryFilter.value || "all";
   categoryFilter.innerHTML = [
-    '<option value="all">全部</option>',
-    ...categories.map((category) => `<option value="${category}">${category}</option>`),
+    '<option value="all">全部来源</option>',
+    ...categories.map((category) => `<option value="${category}">${categoryLabel(category)}</option>`),
   ].join("");
   categoryFilter.value = categories.includes(selected) ? selected : "all";
 }
 
 function filteredChannels() {
   const category = categoryFilter.value;
-  const status = statusFilter.value;
-  const health = healthFilter.value;
   const query = channelSearch.value.trim().toLowerCase();
 
   return channels.filter((channel) => {
     const matchesCategory = category === "all" || channel.category === category;
-    const matchesStatus = status === "all" || (channel.status || "active") === status;
-    const test = channelTestResults.get(channel.channelId);
-    const matchesHealth =
-      health === "all" ||
-      (health === "ok" && test?.ok) ||
-      (health === "failed" && test && !test.ok) ||
-      (health === "untested" && !test);
-    const text = [channel.name, channel.handle, channel.channelId, channel.category].join(" ").toLowerCase();
-    return matchesCategory && matchesStatus && matchesHealth && (!query || text.includes(query));
+    const text = [channel.name, channel.handle, channel.category].join(" ").toLowerCase();
+    return matchesCategory && (!query || text.includes(query));
   });
 }
 
+function totalRecentVideos() {
+  return [...channelTestResults.values()].reduce((sum, result) => sum + Number(result.videoCount || 0), 0);
+}
+
+function todayFeaturedSources() {
+  return new Set((window.TechPulseData.videos || []).map((video) => video.channel).filter(Boolean)).size;
+}
+
 function renderSummary(visibleChannels) {
-  const activeCount = channels.filter((channel) => (channel.status || "active") === "active").length;
   const categoryCount = new Set(channels.map((channel) => channel.category)).size;
-  const failedCount = channels.filter((channel) => {
-    const test = channelTestResults.get(channel.channelId);
-    return test && !test.ok;
-  }).length;
+  const okCount = channelTestMeta?.okCount ?? [...channelTestResults.values()].filter((result) => result.ok).length;
 
   channelSummary.innerHTML = [
-    ["频道总数", channels.length],
-    ["监控中", activeCount],
-    ["分类数", categoryCount],
-    ["测试失败", failedCount],
-    ["当前显示", visibleChannels.length],
+    ["覆盖来源", channels.length],
+    ["来源类别", categoryCount],
+    ["近期视频", totalRecentVideos() || "更新中"],
+    ["可用来源", okCount || "更新中"],
+    ["今日入榜来源", todayFeaturedSources() || "更新中"],
   ]
     .map(([label, value]) => `<article><span>${label}</span><b>${value}</b></article>`)
     .join("");
+
+  if (visibleChannels.length !== channels.length) {
+    channelSummary.insertAdjacentHTML("beforeend", `<article><span>当前显示</span><b>${visibleChannels.length}</b></article>`);
+  }
 }
 
 function formatDateTime(iso) {
-  if (!iso) return "未知";
+  if (!iso) return "持续更新";
   return new Date(iso).toLocaleString("zh-CN", { hour12: false });
 }
 
-function renderTestSummary() {
-  if (!channelTestMeta) {
-    channelTestSummary.innerHTML = `
-      <article>
-        <div>
-          <span class="section-label">Channel Health</span>
-          <h2>尚未生成频道测试结果</h2>
-          <p>运行 <code>RSS_RECENT_HOURS=168 node pipeline/test-channel.mjs pipeline/channels.sample.json pipeline/channel-tests.json</code> 后刷新页面。</p>
-        </div>
-      </article>
-    `;
-    return;
-  }
+function renderSourceQuality() {
+  const okCount = channelTestMeta?.okCount;
+  const count = channelTestMeta?.count || channels.length;
+  const recentHours = channelTestMeta?.recentHours || 168;
+  const generatedAt = formatDateTime(channelTestMeta?.generatedAt);
 
-  const failed = (channelTestMeta.results || []).filter((item) => !item.ok);
-  const healthLabels = { all: "全部", ok: "测试通过", failed: "测试失败", untested: "未测试" };
-  channelTestSummary.innerHTML = `
+  sourceQuality.innerHTML = `
     <article>
       <div>
-        <span class="section-label">Channel Health</span>
-        <h2>${channelTestMeta.okCount}/${channelTestMeta.count} 个频道通过测试</h2>
-        <p>最近测试：${formatDateTime(channelTestMeta.generatedAt)} · 窗口 ${channelTestMeta.recentHours} 小时 · 当前健康筛选：${healthLabels[healthFilter.value] || "全部"}</p>
+        <span class="section-label">Source Quality</span>
+        <h2>${okCount ? `${okCount}/${count} 个来源近期可用` : "来源池持续巡检中"}</h2>
+        <p>最近巡检：${generatedAt} · 观察窗口 ${recentHours} 小时。少量来源可能因发布节奏或 YouTube 抓取延迟暂时没有新内容，不影响每日热榜筛选。</p>
       </div>
-      <div class="channel-test-badges">
-        <button class="good" type="button" data-health-jump="ok">${channelTestMeta.okCount} OK</button>
-        <button class="${failed.length ? "bad" : "good"}" type="button" data-health-jump="failed">${failed.length} FAIL</button>
-        <button type="button" data-health-jump="all">全部</button>
-      </div>
-      <p>${failed.length ? `需要检查：${failed.map((item) => item.name).join("、")}` : "全部频道都能发现近期视频。"}</p>
+      <a class="button secondary" href="./search.html">搜索历史话题</a>
     </article>
   `;
 }
 
-function exportableChannels() {
-  return channels.map((channel) => ({
-    channelId: channel.channelId,
-    name: channel.name,
-    category: channel.category,
-    weight: Number(channel.weight || 1),
-    rssUrl: channel.rssUrl || `https://www.youtube.com/feeds/videos.xml?channel_id=${channel.channelId}`,
-    handle: channel.handle || "",
-    webUrl: channel.webUrl || (channel.handle ? `https://www.youtube.com/${channel.handle}/videos` : ""),
-    status: channel.status || "active",
-  }));
-}
-
-function updateExport() {
-  configOutput.value = JSON.stringify(exportableChannels(), null, 2);
+function renderSample(channel) {
+  const result = channelTestResults.get(channel.channelId);
+  if (!result?.ok) return "近期内容等待下一轮同步";
+  return result.sampleVideos?.[0]?.title || "近期有可用内容";
 }
 
 function renderChannels() {
   const visibleChannels = filteredChannels();
   renderSummary(visibleChannels);
-  renderTestSummary();
-  updateExport();
+  renderSourceQuality();
 
   if (!visibleChannels.length) {
-    channelBoard.innerHTML = '<div class="empty-state"><h3>没有匹配频道</h3><p>调整筛选条件或重置草稿后再试。</p></div>';
+    channelBoard.innerHTML = '<div class="empty-state"><h3>没有匹配来源</h3><p>换一个关键词或选择全部来源再试。</p></div>';
     return;
   }
 
   const grouped = visibleChannels.reduce((acc, channel) => {
-    const type = channelType(channel.category);
+    const type = sourceType(channel.category);
     acc[type] = acc[type] || [];
     acc[type].push(channel);
     return acc;
@@ -222,30 +158,19 @@ function renderChannels() {
         <section class="channel-group">
           <div>
             <span class="section-label">${type}</span>
-            <h2>${groupChannels.length} 个监控频道</h2>
+            <h2>${groupChannels.length} 个内容来源</h2>
           </div>
-          <div class="channel-table editable-channel-table">
+          <div class="channel-table public-channel-table">
             ${groupChannels
               .map(
                 (channel) => `
-                  <article data-id="${channel.channelId}">
+                  <article>
                     <div>
                       <strong>${channel.name}</strong>
-                      <p>${channel.handle || channel.channelId} · ${channel.category}</p>
-                      <p>${channel.webUrl || channel.rssUrl || "等待补充频道链接"}</p>
-                      <p class="channel-test-result">${renderTestResult(channel)}</p>
+                      <p>${channel.handle || channel.webUrl || "官方频道"} · ${categoryLabel(channel.category)}</p>
+                      <p class="channel-test-result">${renderSample(channel)}</p>
                     </div>
-                    <label>
-                      权重
-                      <input class="weight-input" type="number" min="0.2" max="2" step="0.01" value="${Number(channel.weight || 1)}" />
-                    </label>
-                    <span>${channel.status === "paused" ? "暂停" : "监控中"}</span>
-                    <div class="channel-row-actions">
-                      <button type="button" class="${channel.status === "paused" ? "" : "subscribed"}" data-action="toggle">
-                        ${channel.status === "paused" ? "启用" : "暂停"}
-                      </button>
-                      <button type="button" data-action="test-info">测试</button>
-                    </div>
+                    <a class="button compact secondary" href="${channel.webUrl || `https://www.youtube.com/${channel.handle}/videos`}" target="_blank" rel="noreferrer">查看来源</a>
                   </article>
                 `
               )
@@ -257,133 +182,8 @@ function renderChannels() {
     .join("");
 }
 
-function renderTestResult(channel) {
-  const result = channelTestResults.get(channel.channelId);
-  if (!result) return "未测试 · 运行 node pipeline/test-channel.mjs 生成结果";
-  if (!result.ok) return `测试失败 · ${result.error || "未发现可用视频"}`;
-  const sample = result.sampleVideos?.[0]?.title || "已发现视频";
-  return `测试通过 · ${result.source} · ${result.videoCount} 条 · ${sample}`;
-}
-
-function updateChannel(id, patch) {
-  channels = channels.map((channel) => (channel.channelId === id ? { ...channel, ...patch } : channel));
-  saveDraft();
-  renderChannels();
-}
-
-function setFormMessage(message, tone = "neutral") {
-  channelFormMessage.textContent = message;
-  channelFormMessage.dataset.tone = tone;
-}
-
-channelBoard.addEventListener("change", (event) => {
-  if (!event.target.matches(".weight-input")) return;
-  const row = event.target.closest("[data-id]");
-  const weight = Number(event.target.value || 1);
-  updateChannel(row.dataset.id, { weight });
-});
-
-channelBoard.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-action]");
-  if (!button) return;
-  const row = button.closest("[data-id]");
-  const action = button.dataset.action;
-  const channel = channels.find((item) => item.channelId === row.dataset.id);
-
-  if (action === "toggle") {
-    updateChannel(row.dataset.id, { status: channel.status === "paused" ? "active" : "paused" });
-    return;
-  }
-
-  if (action === "test-info") {
-    const result = channelTestResults.get(channel.channelId);
-    if (!result) {
-      setFormMessage(`运行 CHANNEL_QUERY="${channel.name}" node pipeline/test-channel.mjs pipeline/channels.sample.json pipeline/channel-tests.json 后刷新页面。`, "neutral");
-      return;
-    }
-    const status = result.ok ? "通过" : "失败";
-    setFormMessage(`${channel.name} 测试${status}：${result.videoCount} 条，来源 ${result.source || "none"}。`, result.ok ? "success" : "error");
-  }
-});
-
-[categoryFilter, statusFilter, healthFilter, channelSearch].forEach((control) => {
+[categoryFilter, channelSearch].forEach((control) => {
   control.addEventListener("input", renderChannels);
-});
-
-channelTestSummary.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-health-jump]");
-  if (!button) return;
-  healthFilter.value = button.dataset.healthJump;
-  renderChannels();
-});
-
-resetDraftButton.addEventListener("click", async () => {
-  localStorage.removeItem(draftKey);
-  channels = await loadChannels();
-  renderCategoryOptions();
-  renderChannels();
-});
-
-channelAddForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const formData = new FormData(channelAddForm);
-  const name = String(formData.get("name") || "").trim();
-  const category = String(formData.get("category") || "AI");
-  const handle = normalizeHandle(String(formData.get("handle") || ""));
-  const providedChannelId = String(formData.get("channelId") || "").trim();
-  const channelId = providedChannelId || channelIdFromFallback(name, handle);
-  const weight = Number(formData.get("weight") || 1);
-
-  if (!name || (!handle && !providedChannelId)) {
-    setFormMessage("请至少填写频道名，并提供 handle 或 Channel ID。", "error");
-    return;
-  }
-
-  const duplicated = channels.some(
-    (channel) =>
-      channel.channelId.toLowerCase() === channelId.toLowerCase() ||
-      (handle && channel.handle?.toLowerCase() === handle.toLowerCase())
-  );
-  if (duplicated) {
-    setFormMessage("该频道已在监控池中。", "error");
-    return;
-  }
-
-  const urls = buildChannelUrls(providedChannelId, handle);
-  channels = [
-    {
-      channelId,
-      name,
-      category,
-      weight,
-      status: "active",
-      rssUrl: urls.rssUrl,
-      handle,
-      webUrl: urls.webUrl,
-    },
-    ...channels,
-  ];
-
-  saveDraft();
-  renderCategoryOptions();
-  renderChannels();
-  channelAddForm.reset();
-  document.querySelector("#newChannelWeight").value = "1";
-  setFormMessage(`${name} 已加入本地草稿。`, "success");
-});
-
-copyConfigButton.addEventListener("click", async () => {
-  try {
-    await navigator.clipboard.writeText(configOutput.value);
-    copyConfigButton.textContent = "已复制";
-  } catch {
-    configOutput.focus();
-    configOutput.select();
-    copyConfigButton.textContent = "已选中";
-  }
-  setTimeout(() => {
-    copyConfigButton.textContent = "复制 JSON";
-  }, 1400);
 });
 
 Promise.all([loadChannels(), loadChannelTests()]).then(([loadedChannels, loadedTests]) => {
