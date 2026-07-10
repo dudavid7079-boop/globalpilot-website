@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin.html
+Disallow: /logo-options.html
 
-# Replace the domain in sitemap.xml before production deployment.
 Sitemap: https://techpulse.attodigitalhk.com/sitemap.xml
