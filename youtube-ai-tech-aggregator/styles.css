@@ -2305,29 +2305,9 @@ input {
   box-shadow: 0 24px 70px rgba(23, 105, 255, 0.16) !important;
 }
 
-.pricing-note {
-  margin: 0 5vw 96px;
-  padding: 28px;
-  background: #0f172a;
-  color: white;
-  border-radius: 8px;
-}
-
-.pricing-note .section-label,
-.pricing-note p {
-  color: #bfdbfe;
-}
-
-.pricing-note h2 {
-  max-width: 780px;
-  margin: 12px 0;
-  font-size: clamp(30px, 4vw, 52px);
-  line-height: 1.08;
-}
-
-.pricing-note p {
-  max-width: 900px;
-  line-height: 1.8;
+.waitlist-status {
+  margin: -48px 5vw 96px;
+  min-height: 42px;
 }
 
 .waitlist-box {

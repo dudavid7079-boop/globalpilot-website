@@ -34,7 +34,7 @@ function syncPlanButtons() {
 function renderNotice() {
   const items = waitlist();
   if (!items.length) {
-    notice.innerHTML = `<p class="muted-note">加入等待名单后，会在“我的账户”中显示。正式接用户系统后，这里会写入服务端。</p>`;
+    notice.innerHTML = `<p class="muted-note">加入 Pro 或 Team 等待名单后，可在“我的账户”查看状态。</p>`;
     return;
   }
   notice.innerHTML = `
