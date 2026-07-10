@@ -246,3 +246,51 @@ systemctl list-timers globalpilot-health-check.timer --no-pager
 systemctl status globalpilot-health-check.service --no-pager
 journalctl -u globalpilot-health-check.service -n 100 --no-pager
 ```
+
+## 5. 同 VPS 托管 TechPulse
+
+TechPulse 位于同一仓库的 `youtube-ai-tech-aggregator` 目录，是静态站，不需要单独 Node 服务。
+
+### 5.1 Nginx Proxy Manager / FRP 模式
+
+当前生产环境继续使用 NPM 统一入口。VM 上运行两个容器：
+
+```text
+compose.npm.yml       -> GlobalPilot Next.js，端口 3000
+compose.techpulse.yml -> TechPulse 静态站，端口 8103
+```
+
+自动部署脚本 `deploy/vm-deploy-npm.sh` 会同时启动两者，并分别检查：
+
+```text
+http://127.0.0.1:3000/api/health
+http://127.0.0.1:8103/health.json
+```
+
+手动启动 TechPulse：
+
+```bash
+cd /opt/globalpilot
+TECHPULSE_BIND=127.0.0.1 TECHPULSE_PORT=8103 docker compose -f compose.techpulse.yml --env-file .env.production up -d
+```
+
+然后在 NPM 添加：
+
+```text
+Domain Names: techpulse.attodigitalhk.com
+Scheme: http
+Forward Hostname / IP: VM 地址或 FRP 暴露地址
+Forward Port: 8103
+```
+
+完整 NPM 配置见 `deploy/NPM_PROXY_HOSTS.md`。
+
+部署前本地/CI 会同时检查个人网站和 TechPulse：
+
+```bash
+npm run check
+```
+
+### 5.2 Caddy 直连模式
+
+仅当未来不再使用 NPM、由 VPS 直接承接 80/443 流量时，才启用 `compose.yml` 和 `deploy/Caddyfile`。

@@ -8,3 +8,28 @@ globalpilot.attodigitalhk.com {
         format console
     }
 }
+
+techpulse.attodigitalhk.com {
+    encode zstd gzip
+
+    root * /srv/techpulse
+    file_server
+    try_files {path} {path}/ /404.html
+
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+
+    @static {
+        path *.css *.js *.png *.jpg *.jpeg *.webp *.ico *.svg *.json *.xml *.txt *.webmanifest
+    }
+    header @static Cache-Control "public, max-age=3600"
+
+    log {
+        output stdout
+        format console
+    }
+}

@@ -1,0 +1,55 @@
+const user = window.TechPulseAuth.getCurrentUser();
+const subscription = JSON.parse(localStorage.getItem("techpulse-subscription") || "null");
+const waitlist = JSON.parse(localStorage.getItem("techpulse-waitlist") || "[]");
+const hero = document.querySelector("#accountHero");
+const subscriptionBox = document.querySelector("#accountSubscription");
+
+if (!user) {
+  hero.innerHTML = `
+    <span class="section-label">Account Required</span>
+    <h1>登录后查看你的科技快报账户</h1>
+    <p>注册后可以保存订阅偏好、查看完整摘要和历史搜索结果。</p>
+    <a class="button primary" href="${window.TechPulseAuth.authUrl("account")}">免费注册 / 登录</a>
+  `;
+  document.querySelector(".account-layout").innerHTML = "";
+} else {
+  hero.innerHTML = `
+    <span class="section-label">My Account</span>
+    <h1>${user.email}</h1>
+    <p>你当前关注：${user.interest}。注册时间：${new Date(user.createdAt).toLocaleDateString("zh-CN")}。</p>
+  `;
+
+  subscriptionBox.innerHTML = subscription
+    ? `
+      <div class="subscription-summary">
+        <div><span>推送渠道</span><b>${subscription.deliveryChannel}</b></div>
+        <div><span>关键词</span><b>${subscription.keywords}</b></div>
+        <div><span>推送时间</span><b>${subscription.digestTime}</b></div>
+      </div>
+      <a class="button secondary" href="./subscribe.html">修改订阅</a>
+    `
+    : `
+      <div class="empty-state">
+        <h3>还没有保存订阅偏好</h3>
+        <p>订阅频道和关键词后，系统会把每日中文快报推送给你。</p>
+      </div>
+      <a class="button primary" href="./subscribe.html">设置订阅</a>
+    `;
+
+  document.querySelector(".account-main").insertAdjacentHTML(
+    "beforeend",
+    `
+      <section class="account-panel">
+        <span class="section-label">Membership</span>
+        <h2>会员等待名单</h2>
+        ${
+          waitlist.length
+            ? `<div class="subscription-summary">${waitlist
+                .map((item) => `<div><span>${item.plan.toUpperCase()}</span><b>${new Date(item.joinedAt).toLocaleDateString("zh-CN")}</b></div>`)
+                .join("")}</div><a class="button secondary" href="./pricing.html">查看方案</a>`
+            : `<div class="empty-state"><h3>还没有加入等待名单</h3><p>Pro 和 Team 功能会先以等待名单方式验证需求。</p></div><a class="button primary" href="./pricing.html">查看会员方案</a>`
+        }
+      </section>
+    `
+  );
+}

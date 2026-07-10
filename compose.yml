@@ -29,6 +29,7 @@ services:
       - "443:443/udp"
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./youtube-ai-tech-aggregator:/srv/techpulse:ro
       - caddy_data:/data
       - caddy_config:/config
 

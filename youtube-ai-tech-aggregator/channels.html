@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>频道库 - TechPulse</title>
+    <meta name="description" content="管理和浏览海外 AI、科技、数码评测频道监控池。" />
+    <link rel="icon" href="./assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="./assets/favicon.png" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <meta name="theme-color" content="#1769ff" />
+    <meta property="og:title" content="TechPulse 科技脉动" />
+    <meta property="og:description" content="同步全球科技，AI一触即达。" />
+    <meta property="og:site_name" content="TechPulse 科技脉动" />
+    <meta property="og:image" content="https://techpulse.attodigitalhk.com/assets/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TechPulse 科技脉动" />
+    <meta name="twitter:description" content="同步全球科技，AI一触即达。" />
+    <meta name="twitter:image" content="https://techpulse.attodigitalhk.com/assets/og-image.png" />
+    <link rel="canonical" href="https://techpulse.attodigitalhk.com/channels.html" />
+    <meta property="og:url" content="https://techpulse.attodigitalhk.com/channels.html" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="TechPulse 首页"><img class="brand-logo" src="./assets/logo-mark.png" alt="" /><span class="brand-text"><strong>TechPulse</strong><small>科技脉动</small></span></a>
+      <nav aria-label="主导航">
+        <a href="./index.html#hot">Top 20</a>
+        <a href="./search.html">搜索</a>
+        <a href="./topics.html">话题库</a>
+        <a href="./channels.html">频道库</a>
+        <a href="./pipeline.html">聚合引擎</a>
+        <a href="./pricing.html">会员</a>
+        <a class="nav-cta" href="./subscribe.html">订阅</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <span class="section-label">Channel Pool</span>
+        <h1>频道监控池</h1>
+        <p>初始频道池按 AI 先锋、综合科技评测、开发者科技分组，后续可扩展到 50-100 个频道。</p>
+      </section>
+
+      <section class="channel-workbench">
+        <div class="channel-summary" id="channelSummary"></div>
+        <div class="channel-test-summary" id="channelTestSummary"></div>
+        <div class="channel-controls">
+          <label>
+            分类
+            <select id="categoryFilter">
+              <option value="all">全部</option>
+            </select>
+          </label>
+          <label>
+            状态
+            <select id="statusFilter">
+              <option value="all">全部</option>
+              <option value="active">监控中</option>
+              <option value="paused">暂停</option>
+            </select>
+          </label>
+          <label>
+            健康
+            <select id="healthFilter">
+              <option value="all">全部</option>
+              <option value="ok">测试通过</option>
+              <option value="failed">测试失败</option>
+              <option value="untested">未测试</option>
+            </select>
+          </label>
+          <label>
+            搜索
+            <input id="channelSearch" type="search" placeholder="频道名、handle、ID" />
+          </label>
+          <button class="button secondary" type="button" id="resetDraft">重置草稿</button>
+        </div>
+
+        <form class="channel-add-form" id="channelAddForm">
+          <label>
+            频道名
+            <input id="newChannelName" name="name" type="text" placeholder="例如 Anthropic" required />
+          </label>
+          <label>
+            分类
+            <select id="newChannelCategory" name="category">
+              <option value="AI">AI</option>
+              <option value="Platform">Platform</option>
+              <option value="Review">Review</option>
+              <option value="Devices">Devices</option>
+            </select>
+          </label>
+          <label>
+            Handle
+            <input id="newChannelHandle" name="handle" type="text" placeholder="@channel" />
+          </label>
+          <label>
+            Channel ID
+            <input id="newChannelId" name="channelId" type="text" placeholder="UC..." />
+          </label>
+          <label>
+            权重
+            <input id="newChannelWeight" name="weight" type="number" min="0.2" max="2" step="0.01" value="1" />
+          </label>
+          <button class="button primary" type="submit">加入频道池</button>
+          <p id="channelFormMessage" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="channel-board" id="channelBoard"></section>
+
+      <section class="channel-export">
+        <div>
+          <span class="section-label">Config Draft</span>
+          <h2>导出频道池配置</h2>
+          <p>当前编辑保存在本机浏览器中。复制下方 JSON 后，可回填到后端频道池或 `pipeline/channels.sample.json`。</p>
+        </div>
+        <textarea id="channelConfigOutput" readonly></textarea>
+        <div class="source-actions">
+          <button class="button primary" type="button" id="copyConfig">复制 JSON</button>
+          <a class="button secondary" href="./admin.html?source=generated">返回后台</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>TechPulse · 科技脉动</span>
+      <span>Channel pool prototype</span>
+    </footer>
+
+    <script src="./data-loader.js"></script>
+    <script src="./auth.js"></script>
+    <script src="./channels.js"></script>
+  </body>
+</html>

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "validate:content": "node scripts/validate-content.mjs",
-    "check": "npm run validate:content && tsc --noEmit && next build"
+    "check:globalpilot": "npm run validate:content && tsc --noEmit && next build",
+    "check:techpulse": "npm --prefix youtube-ai-tech-aggregator run prelaunch",
+    "check": "npm run check:globalpilot && npm run check:techpulse"
   },
   "dependencies": {
     "gray-matter": "latest",
