@@ -5,6 +5,7 @@ APP_DIR="${APP_DIR:-/opt/globalpilot}"
 LOCAL_HEALTH_URL="${LOCAL_HEALTH_URL:-http://127.0.0.1:3000/api/health}"
 TECHPULSE_HEALTH_URL="${TECHPULSE_HEALTH_URL:-http://127.0.0.1:8103/health.json}"
 PUBLIC_HEALTH_URL="${PUBLIC_HEALTH_URL:-}"
+TECHPULSE_PUBLIC_HEALTH_URL="${TECHPULSE_PUBLIC_HEALTH_URL:-}"
 STATE_FILE="${STATE_FILE:-/tmp/globalpilot-health-state}"
 
 cd "$APP_DIR"
@@ -61,20 +62,28 @@ if [ -n "$PUBLIC_HEALTH_URL" ]; then
   fi
 fi
 
+if [ -n "$TECHPULSE_PUBLIC_HEALTH_URL" ]; then
+  if ! output="$(check_url "TechPulse public site" "$TECHPULSE_PUBLIC_HEALTH_URL" 2>&1)"; then
+    status="failed"
+    details="${details}
+- ${output}"
+  fi
+fi
+
 previous="unknown"
 [ -f "$STATE_FILE" ] && previous="$(cat "$STATE_FILE")"
 
 if [ "$status" = "failed" ]; then
   echo "failed" > "$STATE_FILE"
   if [ "$previous" != "failed" ]; then
-    notify "🚨 GlobalPilot health check failed${details}"
+    notify "GlobalPilot / TechPulse health check failed${details}"
   fi
   exit 1
 fi
 
 echo "ok" > "$STATE_FILE"
 if [ "$previous" = "failed" ]; then
-  notify "✅ GlobalPilot recovered: health check is healthy."
+  notify "GlobalPilot / TechPulse recovered: health check is healthy."
 fi
 
-echo "GlobalPilot health check ok."
+echo "GlobalPilot / TechPulse health check ok."

@@ -11,6 +11,7 @@
     "domain:set": "node pipeline/set-production-domain.mjs",
     "pipeline:demo": "node pipeline/run-local-demo.mjs",
     "pipeline:preview": "RSS_RECENT_HOURS=168 node pipeline/run-real-preview.mjs",
+    "pipeline:refresh": "RSS_RECENT_HOURS=168 node pipeline/run-real-preview.mjs && npm run prelaunch",
     "channels:test": "RSS_RECENT_HOURS=168 node pipeline/test-channel.mjs pipeline/channels.sample.json pipeline/channel-tests.json",
     "invidious:check": "node pipeline/check-invidious.mjs"
   }

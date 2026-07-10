@@ -291,6 +291,8 @@ Forward Port: 8103
 npm run check
 ```
 
+上线后的每日 Top 20 自动刷新、外部监控和公网页面校验见 `deploy/TECHPULSE_OPERATIONS.md`。
+
 ### 5.2 Caddy 直连模式
 
 仅当未来不再使用 NPM、由 VPS 直接承接 80/443 流量时，才启用 `compose.yml` 和 `deploy/Caddyfile`。

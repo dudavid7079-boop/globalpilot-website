@@ -196,3 +196,5 @@ docker compose -f compose.techpulse.yml --env-file .env.production up -d
 ```
 
 不要把 `.env.production`、SSH 私钥或 Ollama 的 11434 端口公开到 GitHub/公网。
+
+TechPulse 上线后的监控、每日 Top 20 自动刷新和公网校验见 [`TECHPULSE_OPERATIONS.md`](TECHPULSE_OPERATIONS.md)。
