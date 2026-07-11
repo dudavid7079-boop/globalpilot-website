@@ -88,7 +88,7 @@ function gateMarkup(title, body, reason) {
       <span class="section-label">Register to unlock</span>
       <h3>${title}</h3>
       <p>${body}</p>
-      <a class="button primary" href="${authUrl(reason)}">免费注册解锁</a>
+      <a class="button primary" href="${authUrl(reason)}" data-analytics-event="register_gate_click" data-analytics-action="${reason}">免费注册解锁</a>
     </div>
   `;
 }
@@ -102,6 +102,11 @@ if (authForm) {
 
   authForm.addEventListener("submit", (event) => {
     event.preventDefault();
+    window.TechPulseAnalytics?.track("register_submit", {
+      reason,
+      interest: document.querySelector("#authInterest").value,
+      next: params.get("next") || "",
+    });
     registerUser({
       email: document.querySelector("#authEmail").value,
       interest: document.querySelector("#authInterest").value,

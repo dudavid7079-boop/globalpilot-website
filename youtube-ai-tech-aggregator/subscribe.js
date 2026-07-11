@@ -39,6 +39,12 @@ function loadPreferences() {
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
+  window.TechPulseAnalytics?.track("subscription_save_click", {
+    deliveryChannel: deliveryChannel.value,
+    keywordCount: keywordInput.value.split(",").map((item) => item.trim()).filter(Boolean).length,
+    digestTime: digestTime.value,
+    registered: window.TechPulseAuth.isRegistered(),
+  });
   if (!window.TechPulseAuth.isRegistered()) {
     notice.innerHTML = `保存订阅需要注册。<a href="${window.TechPulseAuth.authUrl("subscription")}">免费注册后继续</a>`;
     return;

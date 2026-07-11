@@ -135,6 +135,8 @@ nano .env.production
 ```env
 NEXT_PUBLIC_UMAMI_SCRIPT_URL=https://analytics.globalpilot.attodigitalhk.com/script.js
 NEXT_PUBLIC_UMAMI_WEBSITE_ID=从 Umami 后台复制的网站 ID
+TECHPULSE_UMAMI_SCRIPT_URL=https://analytics.globalpilot.attodigitalhk.com/script.js
+TECHPULSE_UMAMI_WEBSITE_ID=TechPulse 对应的网站 ID，也可复用上面的 ID
 ```
 
 然后重建网站：
@@ -142,6 +144,14 @@ NEXT_PUBLIC_UMAMI_WEBSITE_ID=从 Umami 后台复制的网站 ID
 ```bash
 docker compose -f compose.npm.yml --env-file .env.production up -d --build
 ```
+
+如果只更新 TechPulse 静态站，可执行：
+
+```bash
+./deploy/vm-deploy-npm.sh
+```
+
+部署脚本会生成 `youtube-ai-tech-aggregator/analytics-config.local.json`，该文件不提交到 Git，只在服务器本机提供 Umami 配置。
 
 也可以等待下一次 GitHub 更新触发自动部署。
 
@@ -153,6 +163,10 @@ docker compose -f compose.npm.yml --env-file .env.production up -d --build
 - `/chat` 页面访问量
 - 来源网站与国家/地区
 - 新老访客变化
+- TechPulse `video_original_click`：点击 YouTube 原站
+- TechPulse `video_backup_route_click`：点击备用播放线路
+- TechPulse `source_channel_click`：查看来源频道
+- TechPulse `pricing_waitlist_click` / `subscription_save_click`：会员和订阅转化
 
 后续可以再增加事件追踪，例如：
 

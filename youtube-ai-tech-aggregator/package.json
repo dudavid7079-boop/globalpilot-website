@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "serve": "python3 -m http.server 8102 --bind 127.0.0.1",
-    "check": "node --check app.js && node --check auth.js && node --check pricing.js && node --check search.js && node --check subscribe.js && node --check topics.js && node --check channels.js && node --check admin.js && node --check account.js && node --check data-loader.js && node --check playback-config.js && node --check pipeline/check-invidious.mjs",
+    "check": "node --check app.js && node --check auth.js && node --check pricing.js && node --check search.js && node --check subscribe.js && node --check topics.js && node --check channels.js && node --check admin.js && node --check account.js && node --check data-loader.js && node --check playback-config.js && node --check analytics-config.js && node --check analytics.js && node --check pipeline/check-invidious.mjs",
     "validate": "node pipeline/validate-site.mjs",
     "prelaunch": "npm run check && npm run validate",
     "domain:set": "node pipeline/set-production-domain.mjs",

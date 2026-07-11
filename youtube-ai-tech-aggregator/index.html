@@ -53,8 +53,8 @@
             通过 RSS 低成本发现新视频，再用热度半衰期算法和 AI 话题聚类生成每日 Top 20。
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#hot">查看今日热榜</a>
-            <a class="button secondary" href="#pipeline">了解聚合算法</a>
+            <a class="button primary" href="#hot" data-analytics-event="home_hotlist_click" data-analytics-action="hero">查看今日热榜</a>
+            <a class="button secondary" href="#pipeline" data-analytics-event="home_pipeline_click" data-analytics-action="hero">了解聚合算法</a>
           </div>
         </div>
         <aside class="hero-dashboard" aria-label="今日聚合状态">
@@ -232,6 +232,8 @@
       <span>Built for overseas AI & tech video aggregation</span>
     </footer>
 
+    <script src="./analytics-config.js"></script>
+    <script src="./analytics.js"></script>
     <script src="./data-loader.js"></script>
     <script src="./playback-config.js"></script>
     <script src="./auth.js"></script>

@@ -9,6 +9,15 @@ if [ -f .env.production ]; then
 fi
 
 APP_PORT="${APP_PORT:-3000}"
+TECHPULSE_UMAMI_SCRIPT_URL="${TECHPULSE_UMAMI_SCRIPT_URL:-${NEXT_PUBLIC_UMAMI_SCRIPT_URL:-}}"
+TECHPULSE_UMAMI_WEBSITE_ID="${TECHPULSE_UMAMI_WEBSITE_ID:-${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}}"
+
+cat > youtube-ai-tech-aggregator/analytics-config.local.json <<EOF
+{
+  "scriptUrl": "${TECHPULSE_UMAMI_SCRIPT_URL}",
+  "websiteId": "${TECHPULSE_UMAMI_WEBSITE_ID}"
+}
+EOF
 
 docker compose -f compose.npm.yml --env-file .env.production up -d --build
 docker compose -f compose.techpulse.yml --env-file .env.production up -d

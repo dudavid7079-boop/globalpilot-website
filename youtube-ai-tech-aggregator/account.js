@@ -9,7 +9,7 @@ if (!user) {
     <span class="section-label">Account Required</span>
     <h1>登录后查看你的科技快报账户</h1>
     <p>注册后可以保存订阅偏好、查看完整摘要和历史搜索结果。</p>
-    <a class="button primary" href="${window.TechPulseAuth.authUrl("account")}">免费注册 / 登录</a>
+    <a class="button primary" href="${window.TechPulseAuth.authUrl("account")}" data-analytics-event="account_register_click" data-analytics-action="account_required">免费注册 / 登录</a>
   `;
   document.querySelector(".account-layout").innerHTML = "";
 } else {
@@ -26,14 +26,14 @@ if (!user) {
         <div><span>关键词</span><b>${subscription.keywords}</b></div>
         <div><span>推送时间</span><b>${subscription.digestTime}</b></div>
       </div>
-      <a class="button secondary" href="./subscribe.html">修改订阅</a>
+      <a class="button secondary" href="./subscribe.html" data-analytics-event="account_subscription_click" data-analytics-action="edit">修改订阅</a>
     `
     : `
       <div class="empty-state">
         <h3>还没有保存订阅偏好</h3>
         <p>订阅频道和关键词后，系统会把每日中文快报推送给你。</p>
       </div>
-      <a class="button primary" href="./subscribe.html">设置订阅</a>
+      <a class="button primary" href="./subscribe.html" data-analytics-event="account_subscription_click" data-analytics-action="setup">设置订阅</a>
     `;
 
   document.querySelector(".account-main").insertAdjacentHTML(
@@ -46,8 +46,8 @@ if (!user) {
           waitlist.length
             ? `<div class="subscription-summary">${waitlist
                 .map((item) => `<div><span>${item.plan.toUpperCase()}</span><b>${new Date(item.joinedAt).toLocaleDateString("zh-CN")}</b></div>`)
-                .join("")}</div><a class="button secondary" href="./pricing.html">查看方案</a>`
-            : `<div class="empty-state"><h3>还没有加入等待名单</h3><p>Pro 和 Team 功能会先以等待名单方式验证需求。</p></div><a class="button primary" href="./pricing.html">查看会员方案</a>`
+                .join("")}</div><a class="button secondary" href="./pricing.html" data-analytics-event="account_pricing_click" data-analytics-action="waitlist_status">查看方案</a>`
+            : `<div class="empty-state"><h3>还没有加入等待名单</h3><p>Pro 和 Team 功能会先以等待名单方式验证需求。</p></div><a class="button primary" href="./pricing.html" data-analytics-event="account_pricing_click" data-analytics-action="empty_waitlist">查看会员方案</a>`
         }
       </section>
     `

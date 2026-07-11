@@ -36,15 +36,16 @@ function invidiousWatchUrl(videoId) {
 }
 
 function routeActions(videoId) {
+  const video = videos.find((item) => item.videoId === videoId);
   const invidiousButton = isInvidiousHealthy()
-    ? `<a class="button primary" href="${invidiousWatchUrl(videoId)}" target="_blank" rel="noreferrer">备用线路播放</a>`
+    ? `<a class="button primary" href="${invidiousWatchUrl(videoId)}" target="_blank" rel="noreferrer" data-analytics-event="video_backup_route_click" data-analytics-action="topic_detail" data-video-id="${videoId}" data-channel="${video?.channel || ""}" data-category="${video?.category || ""}">备用线路播放</a>`
     : `<a class="button primary disabled" href="#" aria-disabled="true">${
         invidiousStatus?.status === "unhealthy" ? "备用线路维护中" : "备用线路待检测"
       }</a>`;
 
   return `
     ${invidiousButton}
-    <a class="button secondary" href="${youtubeWatchUrl(videoId)}" target="_blank" rel="noreferrer">YouTube 原站</a>
+    <a class="button secondary" href="${youtubeWatchUrl(videoId)}" target="_blank" rel="noreferrer" data-analytics-event="video_original_click" data-analytics-action="topic_detail" data-video-id="${videoId}" data-channel="${video?.channel || ""}" data-category="${video?.category || ""}">YouTube 原站</a>
   `;
 }
 
@@ -123,7 +124,7 @@ function renderDetail(videoId) {
             : related
                 .map(
                   (item) => `
-              <a href="./topics.html?id=${item.videoId}">
+              <a href="./topics.html?id=${item.videoId}" data-analytics-event="related_topic_click" data-analytics-action="topic_detail" data-video-id="${item.videoId}" data-channel="${item.channel}" data-category="${item.category}">
                 <span>${item.channel}</span>
                 <strong>${item.topic}</strong>
               </a>
@@ -143,6 +144,7 @@ directory.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) return;
   history.replaceState(null, "", `./topics.html?id=${button.dataset.videoId}`);
+  window.TechPulseAnalytics?.track("topic_directory_click", { videoId: button.dataset.videoId });
   renderDetail(button.dataset.videoId);
 });
 

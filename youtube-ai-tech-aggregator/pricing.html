@@ -53,7 +53,7 @@
             <li>基础订阅推送</li>
             <li>最近 30 天搜索</li>
           </ul>
-          <a class="button secondary" href="./auth.html?reason=pricing">免费注册</a>
+          <a class="button secondary" href="./auth.html?reason=pricing" data-analytics-event="pricing_free_signup_click" data-analytics-action="pricing_card">免费注册</a>
         </article>
         <article class="featured-plan">
           <span>Pro</span>
@@ -67,7 +67,7 @@
             <li>AI 周报与趋势总结</li>
             <li>高级字幕润色优先队列</li>
           </ul>
-          <button class="button primary" type="button" data-plan="pro">加入 Pro 等待名单</button>
+          <button class="button primary" type="button" data-plan="pro" data-analytics-event="pricing_waitlist_click" data-analytics-action="pricing_card">加入 Pro 等待名单</button>
         </article>
         <article>
           <span>Team</span>
@@ -81,7 +81,7 @@
             <li>企业微信/飞书推送</li>
             <li>私有部署与 API 导出</li>
           </ul>
-          <button class="button secondary" type="button" data-plan="team">加入 Team 等待名单</button>
+          <button class="button secondary" type="button" data-plan="team" data-analytics-event="pricing_waitlist_click" data-analytics-action="pricing_card">加入 Team 等待名单</button>
         </article>
       </section>
 
@@ -93,6 +93,8 @@
       <span>会员方案</span>
     </footer>
 
+    <script src="./analytics-config.js"></script>
+    <script src="./analytics.js"></script>
     <script src="./auth.js"></script>
     <script src="./pricing.js"></script>
   </body>

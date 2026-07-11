@@ -124,7 +124,7 @@ function renderSourceQuality() {
         <h2>${okCount ? `${okCount}/${count} 个来源近期可用` : "来源池持续巡检中"}</h2>
         <p>最近巡检：${generatedAt} · 观察窗口 ${recentHours} 小时。少量来源可能因发布节奏或 YouTube 抓取延迟暂时没有新内容，不影响每日热榜筛选。</p>
       </div>
-      <a class="button secondary" href="./search.html">搜索历史话题</a>
+      <a class="button secondary" href="./search.html" data-analytics-event="source_search_click" data-analytics-action="channels_quality">搜索历史话题</a>
     </article>
   `;
 }
@@ -170,7 +170,7 @@ function renderChannels() {
                       <p>${channel.handle || channel.webUrl || "官方频道"} · ${categoryLabel(channel.category)}</p>
                       <p class="channel-test-result">${renderSample(channel)}</p>
                     </div>
-                    <a class="button compact secondary" href="${channel.webUrl || `https://www.youtube.com/${channel.handle}/videos`}" target="_blank" rel="noreferrer">查看来源</a>
+                    <a class="button compact secondary" href="${channel.webUrl || `https://www.youtube.com/${channel.handle}/videos`}" target="_blank" rel="noreferrer" data-analytics-event="source_channel_click" data-analytics-action="channels_list" data-channel="${channel.name}" data-category="${channel.category}">查看来源</a>
                   </article>
                 `
               )

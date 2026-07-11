@@ -82,6 +82,9 @@ function invidiousWatchUrl(videoId) {
 
 function renderInvidiousAction(videoId) {
   if (!invidiousLink) return;
+  invidiousLink.dataset.analyticsEvent = "video_backup_route_click";
+  invidiousLink.dataset.analyticsAction = "home_player";
+  invidiousLink.dataset.videoId = videoId;
   if (isInvidiousHealthy()) {
     invidiousLink.href = invidiousWatchUrl(videoId);
     invidiousLink.textContent = "备用线路播放";
@@ -150,7 +153,7 @@ function renderTopics() {
                   <span>${formatNumber(video.comments)} comments</span>
                 </div>
                 <div class="topic-tags">${video.tags.map((tag) => `<span>${tag}</span>`).join("")}</div>
-                <a class="detail-link" href="./topics.html?id=${video.videoId}">查看话题详情</a>
+                <a class="detail-link" href="./topics.html?id=${video.videoId}" data-analytics-event="topic_detail_click" data-analytics-action="home_card" data-video-id="${video.videoId}" data-channel="${video.channel}" data-category="${video.category}">查看话题详情</a>
               </div>
             </article>
           `
@@ -178,6 +181,11 @@ function selectVideo(videoId) {
   chapterList.innerHTML = video.chapters.map((chapter) => `<li>${chapter}</li>`).join("");
   renderInvidiousAction(video.videoId);
   youtubeLink.href = youtubeWatchUrl(video.videoId);
+  youtubeLink.dataset.analyticsEvent = "video_original_click";
+  youtubeLink.dataset.analyticsAction = "home_player";
+  youtubeLink.dataset.videoId = video.videoId;
+  youtubeLink.dataset.channel = video.channel;
+  youtubeLink.dataset.category = video.category;
   heroTopic.textContent = video.topic;
   heroSummary.textContent = video.summary;
 }
@@ -193,7 +201,7 @@ function renderChannels() {
             <p>${channel.type}</p>
             <p>${channel.description}</p>
           </div>
-          <button type="button" data-channel="${channel.name}">订阅创作者</button>
+          <button type="button" data-channel="${channel.name}" data-analytics-event="creator_subscribe_click" data-analytics-action="home_channel_card">订阅创作者</button>
         </article>
       `
     )

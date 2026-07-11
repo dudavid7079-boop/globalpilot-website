@@ -30,7 +30,7 @@ function renderSearch() {
     ? visible
         .map(
           (video) => `
-            <a class="archive-card" href="./topics.html?id=${video.videoId}">
+            <a class="archive-card" href="./topics.html?id=${video.videoId}" data-analytics-event="search_result_click" data-analytics-action="search_archive" data-video-id="${video.videoId}" data-channel="${video.channel}" data-category="${video.category}">
               <div>
                 <span>${video.category} · ${video.channel}</span>
                 <h2>${video.topic}</h2>
@@ -57,4 +57,11 @@ function renderSearch() {
 }
 
 [queryInput, categorySelect, sortSelect].forEach((control) => control.addEventListener("input", renderSearch));
+queryInput.addEventListener("change", () => {
+  window.TechPulseAnalytics?.track("search_query_submit", {
+    queryLength: queryInput.value.trim().length,
+    category: categorySelect.value,
+    sort: sortSelect.value,
+  });
+});
 renderSearch();

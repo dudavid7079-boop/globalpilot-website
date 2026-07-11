@@ -47,6 +47,10 @@ function renderNotice() {
 
 document.querySelectorAll("[data-plan]").forEach((button) => {
   button.addEventListener("click", () => {
+    window.TechPulseAnalytics?.track("pricing_plan_select", {
+      plan: button.dataset.plan,
+      registered: window.TechPulseAuth.isRegistered(),
+    });
     if (!window.TechPulseAuth.isRegistered()) {
       location.href = window.TechPulseAuth.authUrl(`${button.dataset.plan}-waitlist`);
       return;
