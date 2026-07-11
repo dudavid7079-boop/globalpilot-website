@@ -5,6 +5,7 @@ const productDetail = document.querySelector("#productDetail");
 const productSearch = document.querySelector("#productSearch");
 const productCategory = document.querySelector("#productCategory");
 const watchOnly = document.querySelector("#watchOnly");
+const productSignalStrip = document.querySelector("#productSignalStrip");
 const WATCHLIST_KEY = "techpulse-product-watchlist";
 
 const productFilters = {
@@ -39,6 +40,43 @@ function filteredProducts() {
   });
 }
 
+function coverageGaps() {
+  return productState.products.filter((product) => (product.sourceMix?.video || 0) < 15 || (product.sourceMix?.community || 0) < 20);
+}
+
+function strongestProduct() {
+  return productState.products.slice().sort((a, b) => b.signalScore - a.signalScore)[0];
+}
+
+function renderSignalStrip() {
+  if (!productSignalStrip) return;
+  const watchedCount = readWatchlist().length;
+  const strongest = strongestProduct();
+  const gaps = coverageGaps();
+  productSignalStrip.innerHTML = `
+    <article>
+      <span>产品实体</span>
+      <b>${String(productState.products.length).padStart(2, "0")}</b>
+      <p>当前产品雷达覆盖数</p>
+    </article>
+    <article>
+      <span>已关注</span>
+      <b>${String(watchedCount).padStart(2, "0")}</b>
+      <p>${watchedCount ? "订阅中心会自动带入关键词" : "可从产品卡片开始关注"}</p>
+    </article>
+    <article>
+      <span>最高信号</span>
+      <b>${strongest?.signalScore || 0}</b>
+      <p>${strongest?.name || "等待数据生成"}</p>
+    </article>
+    <article>
+      <span>证据缺口</span>
+      <b>${String(gaps.length).padStart(2, "0")}</b>
+      <p>${gaps.length ? gaps.slice(0, 2).map((product) => product.name).join(" / ") : "核心产品证据完整"}</p>
+    </article>
+  `;
+}
+
 function isWatching(productId) {
   return readWatchlist().some((item) => item.id === productId);
 }
@@ -59,6 +97,7 @@ function toggleWatchProduct(product) {
         },
       ];
   saveWatchlist(next);
+  renderSignalStrip();
   window.TechPulseAnalytics?.track(existing ? "product_unwatch_click" : "product_watch_click", {
     productId: product.id,
     category: product.category,
@@ -246,4 +285,5 @@ productDetail.addEventListener("click", (event) => {
 
 const initialProductId = new URLSearchParams(location.search).get("id");
 renderCategoryOptions();
+renderSignalStrip();
 renderDetail(initialProductId);
