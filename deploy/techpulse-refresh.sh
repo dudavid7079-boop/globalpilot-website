@@ -19,6 +19,7 @@ fi
 
 if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
   RSS_RECENT_HOURS="$RSS_RECENT_HOURS" node pipeline/run-real-preview.mjs
+  node pipeline/build-products.mjs
   npm run prelaunch
 elif command -v docker >/dev/null 2>&1; then
   DOCKER_ENV_ARGS=""
@@ -36,7 +37,7 @@ elif command -v docker >/dev/null 2>&1; then
     -v "${TECHPULSE_DIR}:/work" \
     -w /work \
     "$NODE_IMAGE" \
-    sh -lc 'node pipeline/run-real-preview.mjs && npm run prelaunch'
+    sh -lc 'node pipeline/run-real-preview.mjs && node pipeline/build-products.mjs && npm run prelaunch'
 else
   echo "Error: node/npm are not installed and docker is not available." >&2
   exit 127

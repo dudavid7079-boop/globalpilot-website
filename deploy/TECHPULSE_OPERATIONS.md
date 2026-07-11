@@ -39,7 +39,7 @@ sudo systemctl enable --now globalpilot-health-check.timer
 sudo systemctl start globalpilot-health-check.service
 ```
 
-## 2. Daily Top 20 Refresh
+## 2. Daily Top 20 + Product Radar Refresh
 
 Install the TechPulse daily refresh timer:
 
@@ -66,6 +66,7 @@ The refresh script runs:
 
 ```text
 youtube-ai-tech-aggregator/pipeline/run-real-preview.mjs
+youtube-ai-tech-aggregator/pipeline/build-products.mjs
 youtube-ai-tech-aggregator/npm run prelaunch
 ```
 
@@ -75,6 +76,7 @@ It updates:
 
 ```text
 youtube-ai-tech-aggregator/data.generated.js
+youtube-ai-tech-aggregator/product-data.generated.js
 youtube-ai-tech-aggregator/pipeline/job-status.json
 youtube-ai-tech-aggregator/pipeline/daily-digest.real.json
 ```

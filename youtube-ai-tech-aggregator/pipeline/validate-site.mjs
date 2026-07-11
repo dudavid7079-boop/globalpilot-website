@@ -8,6 +8,8 @@ const requiredFiles = [
   "data.generated.js",
   "data.js",
   "product-data.js",
+  "product-data.generated.js",
+  "product-loader.js",
   "styles.css",
   "robots.txt",
   "sitemap.xml",
