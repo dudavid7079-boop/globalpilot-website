@@ -1,0 +1,38 @@
+:80 {
+    root * /srv/techpulse
+    encode zstd gzip
+    try_files {path} {path}/ /404.html
+    file_server
+
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+
+    @assets {
+        path /assets/*
+    }
+    header @assets Cache-Control "public, max-age=31536000, immutable"
+
+    @freshData {
+        path /data.generated.js /health.json /pipeline/*.json
+    }
+    header @freshData Cache-Control "public, max-age=300, stale-while-revalidate=3600"
+
+    @html {
+        path / /*.html
+    }
+    header @html Cache-Control "public, max-age=300, stale-while-revalidate=3600"
+
+    @metadata {
+        path /robots.txt /sitemap.xml /site.webmanifest
+    }
+    header @metadata Cache-Control "public, max-age=3600"
+
+    log {
+        output stdout
+        format console
+    }
+}
