@@ -1,6 +1,7 @@
 const user = window.TechPulseAuth.getCurrentUser();
 const subscription = JSON.parse(localStorage.getItem("techpulse-subscription") || "null");
 const waitlist = JSON.parse(localStorage.getItem("techpulse-waitlist") || "[]");
+const productWatchlist = JSON.parse(localStorage.getItem("techpulse-product-watchlist") || "[]");
 const hero = document.querySelector("#accountHero");
 const subscriptionBox = document.querySelector("#accountSubscription");
 
@@ -39,6 +40,17 @@ if (!user) {
   document.querySelector(".account-main").insertAdjacentHTML(
     "beforeend",
     `
+      <section class="account-panel">
+        <span class="section-label">Product Watchlist</span>
+        <h2>关注中的 AI 产品</h2>
+        ${
+          productWatchlist.length
+            ? `<div class="subscription-summary">${productWatchlist
+                .map((item) => `<div><span>${item.name}</span><b>${(item.keywords || []).slice(0, 3).join(" / ")}</b></div>`)
+                .join("")}</div><a class="button secondary" href="./products.html" data-analytics-event="account_products_click" data-analytics-action="watchlist_status">管理关注</a>`
+            : `<div class="empty-state"><h3>还没有关注产品</h3><p>关注产品后，订阅中心会自动带入相关关键词。</p></div><a class="button primary" href="./products.html" data-analytics-event="account_products_click" data-analytics-action="empty_watchlist">去产品雷达</a>`
+        }
+      </section>
       <section class="account-panel">
         <span class="section-label">Membership</span>
         <h2>会员等待名单</h2>

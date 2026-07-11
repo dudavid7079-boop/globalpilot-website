@@ -1521,6 +1521,37 @@ input {
   line-height: 1.6;
 }
 
+.watchlist-preview {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.watchlist-preview div {
+  display: grid;
+  gap: 4px;
+}
+
+.watchlist-preview span {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.watchlist-preview strong {
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.watchlist-preview small {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .subscription-preview h2 {
   margin: 12px 0 18px;
   font-size: clamp(30px, 4vw, 48px);
@@ -2710,6 +2741,17 @@ input {
 .video-proof-list p {
   color: #475569;
   line-height: 1.72;
+}
+
+.product-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.product-actions .button {
+  min-width: 148px;
 }
 
 .signal-score {

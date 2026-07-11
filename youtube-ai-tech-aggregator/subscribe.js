@@ -7,6 +7,29 @@ const notice = document.querySelector("#subscriptionNotice");
 const deliveryChannel = document.querySelector("#deliveryChannel");
 const keywordInput = document.querySelector("#keywordInput");
 const digestTime = document.querySelector("#digestTime");
+const watchlistPreview = document.querySelector("#watchlistPreview");
+const productState = window.TechPulseProducts || { products: [] };
+const WATCHLIST_KEY = "techpulse-product-watchlist";
+
+function watchlist() {
+  return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || "[]");
+}
+
+function requestedProduct() {
+  const id = new URLSearchParams(location.search).get("product");
+  return productState.products.find((product) => product.id === id);
+}
+
+function mergeKeywords(...groups) {
+  return [...new Set(groups.flat().map((item) => item.trim()).filter(Boolean))];
+}
+
+function productKeywords() {
+  const watched = watchlist();
+  const requested = requestedProduct();
+  const products = requested && !watched.some((item) => item.id === requested.id) ? [...watched, requested] : watched;
+  return mergeKeywords(products.flatMap((product) => [product.name, ...(product.keywords || [])]));
+}
 
 function renderPreview() {
   const topVideos = [...videos]
@@ -31,10 +54,33 @@ function renderPreview() {
 
 function loadPreferences() {
   const saved = JSON.parse(localStorage.getItem("techpulse-subscription") || "null");
+  const mergedKeywords = mergeKeywords((saved?.keywords || "OpenAI, MKBHD, AI Agents").split(","), productKeywords());
+  keywordInput.value = mergedKeywords.join(", ");
   if (!saved) return;
   deliveryChannel.value = saved.deliveryChannel;
-  keywordInput.value = saved.keywords;
   digestTime.value = saved.digestTime;
+}
+
+function renderWatchlistPreview() {
+  if (!watchlistPreview) return;
+  const watched = watchlist();
+  const requested = requestedProduct();
+  const products = requested && !watched.some((item) => item.id === requested.id) ? [...watched, requested] : watched;
+  watchlistPreview.innerHTML = products.length
+    ? `
+      <div>
+        <span>已纳入监控</span>
+        <strong>${products.map((product) => product.name).join(" / ")}</strong>
+      </div>
+      <small>这些产品的名称和关键词已自动写入订阅条件。</small>
+    `
+    : `
+      <div>
+        <span>产品监控</span>
+        <strong>还没有关注产品</strong>
+      </div>
+      <small>可先到产品雷达页关注 Cursor、MCP、Claude Code 等实体。</small>
+    `;
 }
 
 form.addEventListener("submit", (event) => {
@@ -55,10 +101,12 @@ form.addEventListener("submit", (event) => {
       deliveryChannel: deliveryChannel.value,
       keywords: keywordInput.value,
       digestTime: digestTime.value,
+      products: watchlist().map((item) => item.id),
     })
   );
   notice.textContent = "订阅偏好已保存，可在“我的账户”查看。";
 });
 
 loadPreferences();
+renderWatchlistPreview();
 renderPreview();

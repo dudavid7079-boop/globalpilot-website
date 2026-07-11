@@ -26,6 +26,7 @@
 
       track(target.dataset.analyticsEvent, {
         action: target.dataset.analyticsAction,
+        productId: target.dataset.productId,
         videoId: target.dataset.videoId,
         channel: target.dataset.channel,
         category: target.dataset.category,

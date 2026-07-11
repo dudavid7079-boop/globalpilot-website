@@ -2,9 +2,44 @@ const productState = window.TechPulseProducts || { products: [] };
 const productVideos = window.TechPulseData?.videos || [];
 const productDirectory = document.querySelector("#productDirectory");
 const productDetail = document.querySelector("#productDetail");
+const WATCHLIST_KEY = "techpulse-product-watchlist";
+
+function readWatchlist() {
+  return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || "[]");
+}
+
+function saveWatchlist(items) {
+  localStorage.setItem(WATCHLIST_KEY, JSON.stringify(items));
+}
 
 function productById(id) {
   return productState.products.find((product) => product.id === id) || productState.products[0];
+}
+
+function isWatching(productId) {
+  return readWatchlist().some((item) => item.id === productId);
+}
+
+function toggleWatchProduct(product) {
+  const items = readWatchlist();
+  const existing = items.find((item) => item.id === product.id);
+  const next = existing
+    ? items.filter((item) => item.id !== product.id)
+    : [
+        ...items,
+        {
+          id: product.id,
+          name: product.name,
+          category: product.category,
+          keywords: product.keywords,
+          addedAt: new Date().toISOString(),
+        },
+      ];
+  saveWatchlist(next);
+  window.TechPulseAnalytics?.track(existing ? "product_unwatch_click" : "product_watch_click", {
+    productId: product.id,
+    category: product.category,
+  });
 }
 
 function relatedVideos(product) {
@@ -59,6 +94,12 @@ function renderDetail(productId) {
         <span class="section-label">${product.category}</span>
         <h2>${product.name}</h2>
         <p>${product.tagline}</p>
+        <div class="product-actions">
+          <button class="button primary" type="button" data-product-watch="${product.id}">
+            ${isWatching(product.id) ? "已关注该产品" : "关注产品信号"}
+          </button>
+          <a class="button secondary" href="./subscribe.html?product=${product.id}" data-analytics-event="product_subscribe_click" data-analytics-action="product_detail" data-product-id="${product.id}" data-category="${product.category}">订阅关键词</a>
+        </div>
       </div>
       <div class="signal-score">
         <span>Signal</span>
@@ -132,6 +173,14 @@ productDirectory.addEventListener("click", (event) => {
   history.replaceState(null, "", `./products.html?id=${productId}`);
   window.TechPulseAnalytics?.track("product_select", { productId });
   renderDetail(productId);
+});
+
+productDetail.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-product-watch]");
+  if (!button) return;
+  const product = productById(button.dataset.productWatch);
+  toggleWatchProduct(product);
+  renderDetail(product.id);
 });
 
 const initialProductId = new URLSearchParams(location.search).get("id");

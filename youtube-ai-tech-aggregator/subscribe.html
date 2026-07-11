@@ -38,14 +38,15 @@
 
     <main>
       <section class="page-hero">
-        <span class="section-label">Subscription Center</span>
-        <h1>订阅每日科技快报</h1>
-        <p>选择你关注的关键词和推送时间，TechPulse 会把海外科技与 AI 热点整理成中文摘要，方便每天快速浏览。</p>
+        <span class="section-label">Signal Subscription</span>
+        <h1>订阅产品信号与每日科技快报</h1>
+        <p>选择你关注的 AI 产品、关键词和推送时间。TechPulse 会把海外产品信号、视频摘要和社区争议整理成中文快报。</p>
       </section>
 
       <section class="subscription-layout">
         <form class="subscription-panel" id="subscriptionForm">
           <span class="section-label">Preferences</span>
+          <div class="watchlist-preview" id="watchlistPreview"></div>
           <label>
             <span>推送渠道</span>
             <select id="deliveryChannel">
@@ -56,7 +57,7 @@
             </select>
           </label>
           <label>
-            <span>关键词</span>
+            <span>关键词 / 产品</span>
             <input id="keywordInput" type="text" value="OpenAI, MKBHD, AI Agents" />
           </label>
           <label>
@@ -87,6 +88,7 @@
     <script src="./analytics-config.js"></script>
     <script src="./analytics.js"></script>
     <script src="./data-loader.js"></script>
+    <script src="./product-loader.js"></script>
     <script src="./auth.js"></script>
     <script src="./subscribe.js"></script>
   </body>
