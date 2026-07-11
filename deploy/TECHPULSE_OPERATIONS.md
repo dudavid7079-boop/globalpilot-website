@@ -1,5 +1,13 @@
 # TechPulse Production Operations
 
+## Runtime data
+
+Pipeline outputs such as `data.generated.js`, `product-data.generated.js`, and
+`pipeline/*.real.json` are runtime files and are intentionally ignored by Git.
+`deploy/vm-deploy-npm.sh` initializes missing files from demo/sample data before
+containers start; the systemd refresh then replaces them with live data. This
+keeps scheduled refreshes from making the deployment worktree dirty.
+
 ## 1. External Monitoring
 
 Create one external monitor in UptimeRobot, Better Stack, or another uptime service:

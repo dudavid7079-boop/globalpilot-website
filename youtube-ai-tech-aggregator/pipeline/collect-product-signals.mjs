@@ -98,7 +98,13 @@ async function collectHackerNews(seed) {
   const query = encodeURIComponent(seed.hnQuery || seed.name);
   try {
     const data = await fetchJson(`https://hn.algolia.com/api/v1/search_by_date?query=${query}&tags=story&hitsPerPage=5`);
-    const stories = (data.hits || []).map((story) => ({
+    const terms = [...new Set([seed.name, seed.id, ...(seed.keywords || []), ...(seed.githubRepos || []).map((repo) => repo.split("/").pop())]
+      .map((term) => String(term || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim())
+      .filter((term) => term.length >= 3))];
+    const stories = (data.hits || []).filter((story) => {
+      const haystack = `${story.title || story.story_title || ""} ${story.url || ""}`.toLowerCase().replace(/[^a-z0-9]+/g, " ");
+      return terms.some((term) => haystack.includes(term));
+    }).map((story) => ({
       title: story.title || story.story_title || "",
       points: story.points || 0,
       comments: story.num_comments || 0,

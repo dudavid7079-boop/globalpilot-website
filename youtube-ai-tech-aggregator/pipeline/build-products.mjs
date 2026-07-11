@@ -23,7 +23,13 @@ function scoreVideo(video) {
 }
 
 function matchVideos(seed, videos) {
-  const keywords = seed.keywords.map((keyword) => keyword.toLowerCase());
+  const genericTerms = new Set(["ai", "llm", "agent", "agents", "tool", "tools", "coding", "developer", "github", "open source"]);
+  const identityTerms = seed.discovered
+    ? [seed.name, seed.id, ...(seed.githubRepos || []).map((repo) => repo.split("/").pop())]
+    : seed.keywords;
+  const keywords = [...new Set(identityTerms
+    .map((keyword) => String(keyword || "").toLowerCase().trim())
+    .filter((keyword) => keyword.length >= 4 && !genericTerms.has(keyword)))];
   return videos
     .map((video) => {
       const haystack = `${video.topic} ${video.summary} ${(video.tags || []).join(" ")} ${video.channel}`.toLowerCase();
@@ -93,9 +99,9 @@ function sourceDigest(seed, signal) {
 
 function buildProduct(seed, videos, signal) {
   const matched = matchVideos(seed, videos);
-  const proofVideos = matched.length ? matched : fallbackVideoProof(seed, videos);
+  const proofVideos = matched.length ? matched : seed.discovered ? [] : fallbackVideoProof(seed, videos);
   const videoBuzzRaw = proofVideos.reduce((sum, video) => sum + scoreVideo(video), 0);
-  const videoWeight = clamp(Math.round(videoBuzzRaw / 1200), 12, 35);
+  const videoWeight = proofVideos.length ? clamp(Math.round(videoBuzzRaw / 1200), 12, 35) : 0;
   const freshnessBoost = proofVideos.some((video) => Number(video.publishedHours || 99) <= 24) ? 8 : 3;
   const githubWeight = dynamicGithubWeight(seed, signal);
   const communityWeight = dynamicCommunityWeight(seed, signal);

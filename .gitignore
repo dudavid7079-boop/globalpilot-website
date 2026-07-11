@@ -13,3 +13,12 @@ npm-debug.log*
 .obsidian/plugins/*/styles.css
 .obsidian/plugins/*/manifest.json
 youtube-ai-tech-aggregator/analytics-config.local.json
+youtube-ai-tech-aggregator/data.generated.js
+youtube-ai-tech-aggregator/product-data.generated.js
+youtube-ai-tech-aggregator/pipeline/candidates.real.json
+youtube-ai-tech-aggregator/pipeline/channel-tests.json
+youtube-ai-tech-aggregator/pipeline/daily-digest.real.json
+youtube-ai-tech-aggregator/pipeline/discovered.real.json
+youtube-ai-tech-aggregator/pipeline/job-status.json
+youtube-ai-tech-aggregator/pipeline/product-seeds.generated.json
+youtube-ai-tech-aggregator/pipeline/product-signals.real.json

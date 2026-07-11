@@ -15,6 +15,18 @@ TECHPULSE_RELEASE_MARKER="${TECHPULSE_RELEASE_MARKER:-20260712-product-radar-v2}
 TECHPULSE_REQUIRE_PUBLIC_CHECK="${TECHPULSE_REQUIRE_PUBLIC_CHECK:-false}"
 TECHPULSE_UMAMI_SCRIPT_URL="${TECHPULSE_UMAMI_SCRIPT_URL:-${NEXT_PUBLIC_UMAMI_SCRIPT_URL:-}}"
 TECHPULSE_UMAMI_WEBSITE_ID="${TECHPULSE_UMAMI_WEBSITE_ID:-${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}}"
+NODE_IMAGE="${NODE_IMAGE:-node:22-alpine}"
+
+if command -v node >/dev/null 2>&1; then
+  (cd youtube-ai-tech-aggregator && node pipeline/init-runtime-data.mjs)
+else
+  docker run --rm \
+    --user "$(id -u):$(id -g)" \
+    -v "$(pwd)/youtube-ai-tech-aggregator:/work" \
+    -w /work \
+    "$NODE_IMAGE" \
+    node pipeline/init-runtime-data.mjs
+fi
 
 cat > youtube-ai-tech-aggregator/analytics-config.local.json <<EOF
 {
