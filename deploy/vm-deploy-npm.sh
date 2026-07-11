@@ -9,6 +9,9 @@ if [ -f .env.production ]; then
 fi
 
 APP_PORT="${APP_PORT:-3000}"
+TECHPULSE_PORT="${TECHPULSE_PORT:-8103}"
+TECHPULSE_PUBLIC_URL="${TECHPULSE_PUBLIC_URL:-https://techpulse.attodigitalhk.com}"
+TECHPULSE_RELEASE_MARKER="${TECHPULSE_RELEASE_MARKER:-20260712-product-radar-v2}"
 TECHPULSE_UMAMI_SCRIPT_URL="${TECHPULSE_UMAMI_SCRIPT_URL:-${NEXT_PUBLIC_UMAMI_SCRIPT_URL:-}}"
 TECHPULSE_UMAMI_WEBSITE_ID="${TECHPULSE_UMAMI_WEBSITE_ID:-${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}}"
 
@@ -36,7 +39,6 @@ for attempt in $(seq 1 30); do
   sleep 2
 done
 
-TECHPULSE_PORT="${TECHPULSE_PORT:-8103}"
 for attempt in $(seq 1 20); do
   if curl --fail --silent --show-error "http://127.0.0.1:${TECHPULSE_PORT}/health.json" >/dev/null; then
     break
@@ -47,5 +49,26 @@ for attempt in $(seq 1 20); do
   fi
   sleep 2
 done
+
+verify_products_release() {
+  url="$1"
+  label="$2"
+  page="$(curl --fail --silent --show-error "${url}/products.html?release=${TECHPULSE_RELEASE_MARKER}")"
+  if ! printf '%s' "$page" | grep -Fq "$TECHPULSE_RELEASE_MARKER"; then
+    printf '%s products page is stale: expected release marker %s at %s/products.html\n' \
+      "$label" "$TECHPULSE_RELEASE_MARKER" "$url" >&2
+    return 1
+  fi
+  printf '%s products page verified: %s\n' "$label" "$TECHPULSE_RELEASE_MARKER"
+}
+
+verify_products_release "http://127.0.0.1:${TECHPULSE_PORT}" "Local TechPulse"
+
+if ! verify_products_release "$TECHPULSE_PUBLIC_URL" "Public TechPulse"; then
+  printf '%s\n' \
+    "Local files are current, but the public domain is serving another target or a stale proxy cache." \
+    "Check the Nginx Proxy Manager forward host/port and the FRP mapping for ${TECHPULSE_PUBLIC_URL}." >&2
+  exit 1
+fi
 
 docker image prune -f
