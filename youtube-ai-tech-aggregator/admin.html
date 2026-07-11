@@ -64,6 +64,15 @@
         <article><span>发布状态</span><b>12</b><p>已通过审核的话题数量。</p></article>
       </section>
 
+      <section class="product-ops-board">
+        <div class="section-heading compact-heading">
+          <span class="section-label">Product Radar Ops</span>
+          <h2>产品信号运营面板</h2>
+          <p>用于判断今天哪些 AI 产品值得重点跟踪，以及哪些档案还缺视频证明或社区证据。</p>
+        </div>
+        <div class="product-ops-grid" id="productOpsGrid"></div>
+      </section>
+
       <section class="admin-layout">
         <div class="job-board">
           <span class="section-label">Pipeline Jobs</span>
@@ -81,7 +90,10 @@
       <span>运营后台</span>
     </footer>
 
+    <script src="./analytics-config.js"></script>
+    <script src="./analytics.js"></script>
     <script src="./data-loader.js"></script>
+    <script src="./product-loader.js"></script>
     <script src="./auth.js"></script>
     <script src="./admin.js"></script>
   </body>

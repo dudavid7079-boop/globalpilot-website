@@ -918,7 +918,9 @@ input {
 .channel-group,
 .job-board,
 .review-board,
-.admin-metrics article {
+.admin-metrics article,
+.product-ops-board,
+.product-ops-grid article {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1400,6 +1402,66 @@ input {
   line-height: 1.6;
 }
 
+.product-ops-board {
+  margin: 0 5vw 24px;
+  padding: 24px;
+}
+
+.product-ops-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.7fr 0.8fr 1.4fr;
+  gap: 12px;
+}
+
+.product-ops-grid article {
+  min-height: 160px;
+  padding: 18px;
+  box-shadow: none;
+}
+
+.product-ops-grid span {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.product-ops-grid b {
+  display: block;
+  margin: 18px 0 8px;
+  font-size: 30px;
+}
+
+.product-ops-grid p {
+  margin: 0 0 14px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.product-ops-list {
+  display: grid;
+  gap: 8px;
+}
+
+.product-ops-list a {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  color: var(--ink);
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.product-ops-list strong {
+  font-size: 14px;
+}
+
+.product-ops-list small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
 .admin-layout {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
@@ -1870,7 +1932,8 @@ input {
   .admin-layout,
   .engine-map,
   .schema-grid,
-  .script-grid {
+  .script-grid,
+  .product-ops-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -1888,13 +1951,13 @@ input {
     position: static;
   }
 
-  .admin-metrics,
-  .related-grid,
-  .search-controls,
-  .archive-card,
-  .cron-table div {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.admin-metrics,
+.related-grid,
+.search-controls,
+.archive-card,
+.cron-table div {
+  grid-template-columns: repeat(2, 1fr);
+}
 }
 
 @media (max-width: 720px) {
@@ -1959,6 +2022,7 @@ input {
   .channel-grid,
   .logo-option-grid,
   .admin-metrics,
+  .product-ops-grid,
   .insight-grid,
   .related-grid {
     grid-template-columns: 1fr;
@@ -2003,6 +2067,7 @@ input {
   .source-note,
   .admin-metrics,
   .admin-layout,
+  .product-ops-board,
   .search-console,
   .subscription-layout,
   .engine-map,

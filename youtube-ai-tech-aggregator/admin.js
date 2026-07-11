@@ -1,7 +1,9 @@
 const { videos } = window.TechPulseData;
 const { scoreVideo, formatNumber } = window.TechPulseUtils;
+const productState = window.TechPulseProducts || { products: [] };
 const dataSourceDescription = document.querySelector("#dataSourceDescription");
 const jobList = document.querySelector("#jobList");
+const productOpsGrid = document.querySelector("#productOpsGrid");
 
 if (dataSourceDescription) {
   dataSourceDescription.textContent =
@@ -103,7 +105,57 @@ function jobsFromStatus(status) {
   ];
 }
 
+function productCoverage(product) {
+  const videoScore = product.sourceMix?.video || 0;
+  const communityScore = product.sourceMix?.community || 0;
+  if (videoScore < 15) return "补视频证明";
+  if (communityScore < 20) return "补社区舆情";
+  if (product.signalScore >= 85) return "优先跟踪";
+  return "持续观察";
+}
+
+function renderProductOps() {
+  if (!productOpsGrid) return;
+  const products = [...productState.products].sort((a, b) => b.signalScore - a.signalScore);
+  const topProducts = products.slice(0, 5);
+  const weakCoverage = products.filter((product) => (product.sourceMix?.video || 0) < 15 || (product.sourceMix?.community || 0) < 20);
+  const categories = [...new Set(products.map((product) => product.category))];
+
+  productOpsGrid.innerHTML = `
+    <article>
+      <span>今日重点</span>
+      <b>${topProducts[0]?.name || "暂无产品"}</b>
+      <p>${topProducts[0] ? `${topProducts[0].category} · Signal ${topProducts[0].signalScore} · ${topProducts[0].signalTrend} today` : "等待产品雷达数据生成。"}</p>
+      <a class="detail-link" href="./products.html?id=${topProducts[0]?.id || ""}" data-analytics-event="admin_product_open_click" data-analytics-action="top_product" data-product-id="${topProducts[0]?.id || ""}">查看档案</a>
+    </article>
+    <article>
+      <span>覆盖缺口</span>
+      <b>${weakCoverage.length}</b>
+      <p>${weakCoverage.length ? weakCoverage.slice(0, 3).map((product) => product.name).join(" / ") : "当前核心产品都有基础证据覆盖。"}</p>
+    </article>
+    <article>
+      <span>分类覆盖</span>
+      <b>${categories.length}</b>
+      <p>${categories.join(" / ")}</p>
+    </article>
+    <article class="product-ops-list">
+      <span>Top Signals</span>
+      ${topProducts
+        .map(
+          (product) => `
+            <a href="./products.html?id=${product.id}" data-analytics-event="admin_product_open_click" data-analytics-action="ops_list" data-product-id="${product.id}">
+              <strong>${product.name}</strong>
+              <small>${productCoverage(product)} · ${product.category} · ${product.signalScore}</small>
+            </a>
+          `
+        )
+        .join("")}
+    </article>
+  `;
+}
+
 renderJobs(fallbackJobs);
+renderProductOps();
 
 fetch("./pipeline/job-status.json", { cache: "no-store" })
   .then((response) => (response.ok ? response.json() : null))
