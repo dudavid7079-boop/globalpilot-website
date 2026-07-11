@@ -1,6 +1,7 @@
 const { videos, channels } = window.TechPulseData;
 const { scoreVideo, formatNumber } = window.TechPulseUtils;
 const productState = window.TechPulseProducts || { products: [] };
+productState.products = Array.isArray(productState.products) ? productState.products : [];
 
 const topicList = document.querySelector("#topicList");
 const categoryFilter = document.querySelector("#categoryFilter");
@@ -101,6 +102,16 @@ function renderPipelineStatus(jobStatus, channelTests) {
 
 function renderProductRadar() {
   if (!productRadar) return;
+  if (!productState.products.length) {
+    productRadar.innerHTML = `
+      <div class="product-radar-empty">
+        <strong>产品信号正在同步</strong>
+        <p>GitHub 与 Hacker News 数据暂未加载，请稍后刷新或打开完整产品雷达。</p>
+        <a class="button primary" href="./products.html">打开完整产品雷达</a>
+      </div>
+    `;
+    return;
+  }
   productRadar.innerHTML = productState.products
     .slice()
     .sort((a, b) => b.signalScore - a.signalScore)
@@ -115,11 +126,11 @@ function renderProductRadar() {
             <div class="topic-meta">
               <span>${product.category}</span>
               <span>${product.signalTrend} today</span>
-              <span>${product.videos.length} video proofs</span>
+              <span>${Array.isArray(product.videos) ? product.videos.length : 0} video proofs</span>
             </div>
             <h3>${product.name}</h3>
             <p>${product.tagline}</p>
-            <div class="topic-tags">${product.evidence.map((item) => `<span>${item}</span>`).join("")}</div>
+            <div class="topic-tags">${(Array.isArray(product.evidence) ? product.evidence : []).map((item) => `<span>${item}</span>`).join("")}</div>
             <div class="product-card-actions">
               <button type="button" data-product-watch="${product.id}">${isProductWatched(product.id) ? "已关注" : "关注信号"}</button>
               <a href="./subscribe.html?product=${product.id}" data-analytics-event="product_subscribe_click" data-analytics-action="home_radar" data-product-id="${product.id}" data-category="${product.category}">订阅关键词</a>

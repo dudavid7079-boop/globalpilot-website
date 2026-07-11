@@ -2663,6 +2663,25 @@ input {
   margin-top: 28px;
 }
 
+.product-radar-empty {
+  grid-column: 1 / -1;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.product-radar-empty strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.product-radar-empty p {
+  margin: 0 0 18px;
+  color: #64748b;
+}
+
 .product-radar-card {
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr);
