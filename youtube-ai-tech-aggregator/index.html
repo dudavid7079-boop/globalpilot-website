@@ -32,7 +32,8 @@
         <span class="brand-text"><strong>TechPulse</strong><small>科技脉动</small></span>
       </a>
       <nav aria-label="主导航">
-        <a href="#hot">Top 20</a>
+        <a href="#products">产品雷达</a>
+        <a href="#hot">视频热榜</a>
         <a href="./search.html">搜索</a>
         <a href="./topics.html">话题库</a>
         <a href="#pipeline">算法</a>
@@ -45,15 +46,16 @@
     <main id="top">
       <section class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Overseas Tech & AI Video Radar</p>
+          <p class="eyebrow">Global AI Product Radar</p>
           <p class="brand-slogan">TechPulse 同步全球科技，AI一触即达。</p>
-          <h1>每天 8 点，读懂海外科技视频热榜。</h1>
+          <h1>每天 8 点，看透全球 AI 产品信号。</h1>
           <p class="hero-intro">
-            TechPulse 面向中文用户自动监控 YouTube 顶级 AI 与科技频道，
-            通过 RSS 低成本发现新视频，再用热度半衰期算法和 AI 话题聚类生成每日 Top 20。
+            TechPulse 2.0 把海外视频情报升级为 AI 产品雷达：围绕产品实体聚合视频摘要、社区讨论、GitHub 生态和趋势信号，
+            帮中文用户判断一个产品是否值得试用、跟进或纳入竞品研究。
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#hot" data-analytics-event="home_hotlist_click" data-analytics-action="hero">查看今日热榜</a>
+            <a class="button primary" href="#products" data-analytics-event="home_product_radar_click" data-analytics-action="hero">查看产品雷达</a>
+            <a class="button secondary" href="#hot" data-analytics-event="home_hotlist_click" data-analytics-action="hero">查看视频热榜</a>
             <a class="button secondary" href="#pipeline" data-analytics-event="home_pipeline_click" data-analytics-action="hero">了解聚合算法</a>
           </div>
         </div>
@@ -65,11 +67,11 @@
           <div class="pulse-grid">
             <div>
               <b id="statTopics">20</b>
-              <span>核心话题</span>
+              <span>视频话题</span>
             </div>
             <div>
-              <b>84</b>
-              <span>监控频道</span>
+              <b id="statProducts">05</b>
+              <span>产品实体</span>
             </div>
             <div>
               <b>6h</b>
@@ -82,13 +84,15 @@
           </div>
           <div class="signal-card">
             <span>HOTTEST NOW</span>
-            <strong id="heroTopic">AI coding agents enter the IDE war</strong>
-            <p id="heroSummary">多家开发工具频道同时评测新一代代码智能体，重点关注上下文窗口、工具调用、成本和本地隐私。</p>
+            <strong id="heroTopic">Cursor, Claude Code and MCP lead the AI workflow stack</strong>
+            <p id="heroSummary">今日雷达把视频证明、开发者讨论和产品信号合并到同一张情报卡里，优先判断产品价值而不是单纯追视频播放。</p>
           </div>
         </aside>
       </section>
 
       <section class="ticker" aria-label="核心能力">
+        <span>Product Entity Radar</span>
+        <b>/</b>
         <span>RSS 轮询</span>
         <b>/</b>
         <span>YouTube Data API v3</span>
@@ -102,10 +106,22 @@
 
       <section class="home-status" id="pipelineStatus" aria-label="数据源与频道健康状态"></section>
 
+      <section id="products" class="section product-radar-section">
+        <div class="section-heading">
+          <span class="section-label">Today's Signal Radar</span>
+          <h2>从“看视频”升级为“看产品”。</h2>
+          <p>每个产品实体都汇总视频证明、社区讨论、技术生态和风险判断。当前先用轻量 JSON 数据层跑通，后续再接 GitHub / HN / Product Hunt 自动采集。</p>
+        </div>
+        <div class="product-radar-grid" id="productRadar"></div>
+        <div class="radar-footer-action">
+          <a class="button primary" href="./products.html" data-analytics-event="product_radar_more_click" data-analytics-action="home_products">打开完整产品雷达</a>
+        </div>
+      </section>
+
       <section class="control-panel" aria-label="热榜筛选">
         <div>
-          <span class="section-label">Daily Top 20</span>
-          <h2>今日海外科技 & AI 热门话题</h2>
+          <span class="section-label">Video Intelligence</span>
+          <h2>今日海外科技 & AI 视频证明</h2>
         </div>
         <div class="controls">
           <label>
@@ -235,6 +251,7 @@
     <script src="./analytics-config.js"></script>
     <script src="./analytics.js"></script>
     <script src="./data-loader.js"></script>
+    <script src="./product-data.js"></script>
     <script src="./playback-config.js"></script>
     <script src="./auth.js"></script>
     <script src="./app.js"></script>

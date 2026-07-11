@@ -7,6 +7,7 @@ const requiredFiles = [
   "404.html",
   "data.generated.js",
   "data.js",
+  "product-data.js",
   "styles.css",
   "robots.txt",
   "sitemap.xml",

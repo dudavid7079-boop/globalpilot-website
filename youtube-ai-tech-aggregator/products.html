@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 产品雷达 - TechPulse</title>
+    <meta name="description" content="TechPulse AI 产品雷达，把 GitHub、社区讨论和海外视频摘要聚合成中文产品情报卡。" />
+    <link rel="icon" href="./assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="./assets/favicon.png" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <meta name="theme-color" content="#1769ff" />
+    <meta property="og:title" content="TechPulse AI 产品雷达" />
+    <meta property="og:description" content="一个地方，看透一个全球 AI 产品。" />
+    <meta property="og:site_name" content="TechPulse 科技脉动" />
+    <meta property="og:image" content="https://techpulse.attodigitalhk.com/assets/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TechPulse AI 产品雷达" />
+    <meta name="twitter:description" content="一个地方，看透一个全球 AI 产品。" />
+    <meta name="twitter:image" content="https://techpulse.attodigitalhk.com/assets/og-image.png" />
+    <link rel="canonical" href="https://techpulse.attodigitalhk.com/products.html" />
+    <meta property="og:url" content="https://techpulse.attodigitalhk.com/products.html" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="TechPulse 首页"><img class="brand-logo" src="./assets/logo-mark.png" width="62" height="42" decoding="async" alt="" /><span class="brand-text"><strong>TechPulse</strong><small>科技脉动</small></span></a>
+      <nav aria-label="主导航">
+        <a href="./index.html#products">产品雷达</a>
+        <a href="./index.html#hot">视频热榜</a>
+        <a href="./search.html">搜索</a>
+        <a href="./channels.html">来源</a>
+        <a href="./pricing.html">会员</a>
+        <a class="nav-cta" href="./subscribe.html">订阅</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero product-hero">
+        <span class="section-label">Product Intelligence</span>
+        <h1>一个地方，看透一个全球 AI 产品。</h1>
+        <p>把视频热榜升级为产品实体雷达：每张卡片都聚合产品简介、社区争议、GitHub 状态和海外视频证明。</p>
+      </section>
+
+      <section class="product-workbench">
+        <aside class="product-directory" id="productDirectory" aria-label="AI 产品列表"></aside>
+        <article class="product-detail" id="productDetail"></article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>TechPulse · 科技脉动</span>
+      <span>AI 产品雷达 MVP</span>
+    </footer>
+
+    <script src="./analytics-config.js"></script>
+    <script src="./analytics.js"></script>
+    <script src="./data-loader.js"></script>
+    <script src="./product-data.js"></script>
+    <script src="./auth.js"></script>
+    <script src="./products.js"></script>
+  </body>
+</html>

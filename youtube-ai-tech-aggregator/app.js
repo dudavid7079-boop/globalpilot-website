@@ -1,5 +1,6 @@
 const { videos, channels } = window.TechPulseData;
 const { scoreVideo, formatNumber } = window.TechPulseUtils;
+const productState = window.TechPulseProducts || { products: [] };
 
 const topicList = document.querySelector("#topicList");
 const categoryFilter = document.querySelector("#categoryFilter");
@@ -16,6 +17,7 @@ const youtubeLink = document.querySelector("#youtubeLink");
 const heroTopic = document.querySelector("#heroTopic");
 const heroSummary = document.querySelector("#heroSummary");
 const pipelineStatus = document.querySelector("#pipelineStatus");
+const productRadar = document.querySelector("#productRadar");
 const playbackConfig = window.TechPulsePlayback || {};
 let invidiousStatus = null;
 
@@ -59,6 +61,37 @@ function renderPipelineStatus(jobStatus, channelTests) {
       </a>
     </div>
   `;
+}
+
+function renderProductRadar() {
+  if (!productRadar) return;
+  productRadar.innerHTML = productState.products
+    .slice()
+    .sort((a, b) => b.signalScore - a.signalScore)
+    .map(
+      (product, index) => `
+        <article class="product-radar-card">
+          <div class="product-rank">
+            <b>${String(index + 1).padStart(2, "0")}</b>
+            <span>Signal ${product.signalScore}</span>
+          </div>
+          <div>
+            <div class="topic-meta">
+              <span>${product.category}</span>
+              <span>${product.signalTrend} today</span>
+              <span>${product.videos.length} video proofs</span>
+            </div>
+            <h3>${product.name}</h3>
+            <p>${product.tagline}</p>
+            <div class="topic-tags">${product.evidence.map((item) => `<span>${item}</span>`).join("")}</div>
+            <a class="detail-link" href="./products.html?id=${product.id}" data-analytics-event="product_detail_click" data-analytics-action="home_radar" data-category="${product.category}">查看产品情报卡</a>
+          </div>
+        </article>
+      `
+    )
+    .join("");
+  const statProducts = document.querySelector("#statProducts");
+  if (statProducts) statProducts.textContent = String(productState.products.length).padStart(2, "0");
 }
 
 function isInvidiousHealthy() {
@@ -238,5 +271,6 @@ channelGrid.addEventListener("click", (event) => {
 });
 
 renderChannels();
+renderProductRadar();
 renderTopics();
 initStatus();
