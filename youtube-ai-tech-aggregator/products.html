@@ -43,7 +43,24 @@
       </section>
 
       <section class="product-workbench">
-        <aside class="product-directory" id="productDirectory" aria-label="AI 产品列表"></aside>
+        <aside class="product-directory" aria-label="AI 产品列表">
+          <span class="section-label">Today's Signal Radar</span>
+          <div class="product-filter-bar">
+            <label>
+              <span>搜索</span>
+              <input id="productSearch" type="search" placeholder="产品、分类、关键词" />
+            </label>
+            <label>
+              <span>分类</span>
+              <select id="productCategory"></select>
+            </label>
+            <label class="product-watch-filter">
+              <input id="watchOnly" type="checkbox" />
+              <span>只看已关注</span>
+            </label>
+          </div>
+          <div id="productDirectory"></div>
+        </aside>
         <article class="product-detail" id="productDetail"></article>
       </section>
     </main>

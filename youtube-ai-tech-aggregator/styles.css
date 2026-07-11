@@ -2743,6 +2743,42 @@ input {
   box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
 }
 
+.product-filter-bar {
+  display: grid;
+  gap: 10px;
+}
+
+.product-filter-bar label {
+  display: grid;
+  gap: 6px;
+}
+
+.product-filter-bar span,
+.product-watch-filter span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.product-filter-bar input,
+.product-filter-bar select {
+  width: 100%;
+}
+
+.product-watch-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.product-watch-filter input {
+  width: auto;
+}
+
 .product-directory button {
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
@@ -2777,6 +2813,16 @@ input {
   color: var(--muted);
   font-size: 12px;
   font-weight: 700;
+}
+
+.compact-empty {
+  padding: 16px;
+}
+
+.product-empty-state {
+  min-height: 260px;
+  display: grid;
+  align-content: center;
 }
 
 .product-detail {

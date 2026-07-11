@@ -2,7 +2,16 @@ const productState = window.TechPulseProducts || { products: [] };
 const productVideos = window.TechPulseData?.videos || [];
 const productDirectory = document.querySelector("#productDirectory");
 const productDetail = document.querySelector("#productDetail");
+const productSearch = document.querySelector("#productSearch");
+const productCategory = document.querySelector("#productCategory");
+const watchOnly = document.querySelector("#watchOnly");
 const WATCHLIST_KEY = "techpulse-product-watchlist";
+
+const productFilters = {
+  query: "",
+  category: "all",
+  watchOnly: false,
+};
 
 function readWatchlist() {
   return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || "[]");
@@ -14,6 +23,20 @@ function saveWatchlist(items) {
 
 function productById(id) {
   return productState.products.find((product) => product.id === id) || productState.products[0];
+}
+
+function productHaystack(product) {
+  return [product.name, product.category, product.tagline, product.quickTake, ...(product.keywords || []), ...(product.evidence || [])].join(" ").toLowerCase();
+}
+
+function filteredProducts() {
+  const query = productFilters.query.trim().toLowerCase();
+  return productState.products.filter((product) => {
+    const categoryMatch = productFilters.category === "all" || product.category === productFilters.category;
+    const queryMatch = !query || productHaystack(product).includes(query);
+    const watchMatch = !productFilters.watchOnly || isWatching(product.id);
+    return categoryMatch && queryMatch && watchMatch;
+  });
 }
 
 function isWatching(productId) {
@@ -54,22 +77,29 @@ function relatedVideos(product) {
 }
 
 function renderDirectory(activeId) {
-  productDirectory.innerHTML = `
-    <span class="section-label">Today's Signal Radar</span>
-    ${productState.products
-      .map(
-        (product, index) => `
-          <button class="${product.id === activeId ? "active" : ""}" data-product-id="${product.id}">
-            <b>${String(index + 1).padStart(2, "0")}</b>
-            <span>
-              <strong>${product.name}</strong>
-              <small>${product.category} · Score ${product.signalScore}</small>
-            </span>
-          </button>
-        `
-      )
-      .join("")}
-  `;
+  const products = filteredProducts();
+  const content = products.length
+    ? products
+        .map(
+          (product, index) => `
+            <button class="${product.id === activeId ? "active" : ""}" data-product-id="${product.id}">
+              <b>${String(index + 1).padStart(2, "0")}</b>
+              <span>
+                <strong>${product.name}</strong>
+                <small>${product.category} · Score ${product.signalScore}</small>
+              </span>
+            </button>
+          `
+        )
+        .join("")
+    : `<div class="empty-state compact-empty"><h3>没有匹配产品</h3><p>换个关键词，或关闭“只看已关注”。</p></div>`;
+  productDirectory.innerHTML = content;
+}
+
+function renderCategoryOptions() {
+  if (!productCategory) return;
+  const categories = [...new Set(productState.products.map((product) => product.category))].sort();
+  productCategory.innerHTML = [`<option value="all">全部分类</option>`, ...categories.map((category) => `<option value="${category}">${category}</option>`)].join("");
 }
 
 function metricBlock(label, value, detail) {
@@ -83,7 +113,20 @@ function metricBlock(label, value, detail) {
 }
 
 function renderDetail(productId) {
-  const product = productById(productId);
+  const products = filteredProducts();
+  const requested = productById(productId);
+  if (!products.length) {
+    renderDirectory(requested?.id);
+    productDetail.innerHTML = `
+      <section class="empty-state product-empty-state">
+        <h3>没有匹配的产品档案</h3>
+        <p>可以清空搜索、切换分类，或先取消“只看已关注”。TechPulse 会在后续刷新中继续扩展产品实体库。</p>
+      </section>
+    `;
+    return;
+  }
+
+  const product = products.find((item) => item.id === requested?.id) || products[0];
   if (!product) return;
   const videos = relatedVideos(product);
   renderDirectory(product.id);
@@ -175,6 +218,24 @@ productDirectory.addEventListener("click", (event) => {
   renderDetail(productId);
 });
 
+productSearch?.addEventListener("input", (event) => {
+  productFilters.query = event.target.value;
+  window.TechPulseAnalytics?.track("product_filter_change", { action: "search", queryLength: productFilters.query.length });
+  renderDetail(productById(new URLSearchParams(location.search).get("id"))?.id);
+});
+
+productCategory?.addEventListener("change", (event) => {
+  productFilters.category = event.target.value;
+  window.TechPulseAnalytics?.track("product_filter_change", { action: "category", category: productFilters.category });
+  renderDetail(productById(new URLSearchParams(location.search).get("id"))?.id);
+});
+
+watchOnly?.addEventListener("change", (event) => {
+  productFilters.watchOnly = event.target.checked;
+  window.TechPulseAnalytics?.track("product_filter_change", { action: "watch_only", enabled: productFilters.watchOnly });
+  renderDetail(productById(new URLSearchParams(location.search).get("id"))?.id);
+});
+
 productDetail.addEventListener("click", (event) => {
   const button = event.target.closest("[data-product-watch]");
   if (!button) return;
@@ -184,4 +245,5 @@ productDetail.addEventListener("click", (event) => {
 });
 
 const initialProductId = new URLSearchParams(location.search).get("id");
+renderCategoryOptions();
 renderDetail(initialProductId);
