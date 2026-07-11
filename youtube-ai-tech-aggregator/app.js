@@ -19,7 +19,43 @@ const heroSummary = document.querySelector("#heroSummary");
 const pipelineStatus = document.querySelector("#pipelineStatus");
 const productRadar = document.querySelector("#productRadar");
 const playbackConfig = window.TechPulsePlayback || {};
+const PRODUCT_WATCHLIST_KEY = "techpulse-product-watchlist";
 let invidiousStatus = null;
+
+function readProductWatchlist() {
+  return JSON.parse(localStorage.getItem(PRODUCT_WATCHLIST_KEY) || "[]");
+}
+
+function saveProductWatchlist(items) {
+  localStorage.setItem(PRODUCT_WATCHLIST_KEY, JSON.stringify(items));
+}
+
+function isProductWatched(productId) {
+  return readProductWatchlist().some((item) => item.id === productId);
+}
+
+function toggleProductWatch(product) {
+  const items = readProductWatchlist();
+  const existing = items.find((item) => item.id === product.id);
+  const next = existing
+    ? items.filter((item) => item.id !== product.id)
+    : [
+        ...items,
+        {
+          id: product.id,
+          name: product.name,
+          category: product.category,
+          keywords: product.keywords,
+          addedAt: new Date().toISOString(),
+        },
+      ];
+  saveProductWatchlist(next);
+  window.TechPulseAnalytics?.track(existing ? "product_unwatch_click" : "product_watch_click", {
+    action: "home_radar",
+    productId: product.id,
+    category: product.category,
+  });
+}
 
 async function readJson(path) {
   try {
@@ -84,7 +120,11 @@ function renderProductRadar() {
             <h3>${product.name}</h3>
             <p>${product.tagline}</p>
             <div class="topic-tags">${product.evidence.map((item) => `<span>${item}</span>`).join("")}</div>
-            <a class="detail-link" href="./products.html?id=${product.id}" data-analytics-event="product_detail_click" data-analytics-action="home_radar" data-category="${product.category}">查看产品情报卡</a>
+            <div class="product-card-actions">
+              <button type="button" data-product-watch="${product.id}">${isProductWatched(product.id) ? "已关注" : "关注信号"}</button>
+              <a href="./subscribe.html?product=${product.id}" data-analytics-event="product_subscribe_click" data-analytics-action="home_radar" data-product-id="${product.id}" data-category="${product.category}">订阅关键词</a>
+              <a class="detail-link" href="./products.html?id=${product.id}" data-analytics-event="product_detail_click" data-analytics-action="home_radar" data-product-id="${product.id}" data-category="${product.category}">查看档案</a>
+            </div>
           </div>
         </article>
       `
@@ -268,6 +308,15 @@ channelGrid.addEventListener("click", (event) => {
   if (!button) return;
   button.classList.toggle("subscribed");
   button.textContent = button.classList.contains("subscribed") ? "已订阅" : "订阅创作者";
+});
+
+productRadar?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-product-watch]");
+  if (!button) return;
+  const product = productState.products.find((item) => item.id === button.dataset.productWatch);
+  if (!product) return;
+  toggleProductWatch(product);
+  renderProductRadar();
 });
 
 renderChannels();
