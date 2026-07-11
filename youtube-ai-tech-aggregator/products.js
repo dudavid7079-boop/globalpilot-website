@@ -352,9 +352,9 @@ function renderDetail(productId) {
   `;
 }
 
-productDirectory.addEventListener("click", (event) => {
+productDirectory?.addEventListener("click", (event) => {
   const button = event.target.closest("button");
-  if (!button) return;
+  if (!button || !button.dataset.productId) return;
   const productId = button.dataset.productId;
   history.replaceState(null, "", `./products.html?id=${productId}`);
   window.TechPulseAnalytics?.track("product_select", { productId });
@@ -379,10 +379,11 @@ watchOnly?.addEventListener("change", (event) => {
   renderDetail(productById(new URLSearchParams(location.search).get("id"))?.id);
 });
 
-productDetail.addEventListener("click", (event) => {
+productDetail?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-product-watch]");
   if (!button) return;
   const product = productById(button.dataset.productWatch);
+  if (!product) return;
   toggleWatchProduct(product);
   renderDetail(product.id);
 });

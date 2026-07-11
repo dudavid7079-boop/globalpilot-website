@@ -2740,17 +2740,71 @@ input {
   margin-top: 24px;
 }
 
+.product-page main {
+  background:
+    linear-gradient(180deg, #f6f9ff 0, #f8fafc 380px, #eef4fb 100%);
+}
+
+.product-page .site-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+}
+
 .product-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 32px;
+  align-items: end;
+  padding-top: 58px;
+  padding-bottom: 42px;
   background:
     linear-gradient(135deg, rgba(23, 105, 255, 0.12), rgba(19, 163, 109, 0.08)),
     #f8fbff;
+}
+
+.product-hero h1 {
+  max-width: 1080px;
+  font-size: clamp(44px, 4.4vw, 72px);
+}
+
+.product-hero p {
+  max-width: 820px;
+}
+
+.product-hero-panel {
+  padding: 22px;
+  color: white;
+  background: #0f172a;
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+.product-hero-panel span {
+  color: #93c5fd;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.product-hero-panel strong {
+  display: block;
+  margin: 12px 0;
+  font-size: 24px;
+  line-height: 1.12;
+}
+
+.product-hero-panel p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 .product-signal-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  padding: 24px 5vw 0;
+  padding: 22px 5vw 0;
 }
 
 .product-signal-strip article {
@@ -2782,9 +2836,9 @@ input {
 
 .product-workbench {
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-columns: 320px minmax(0, 1fr);
   gap: 24px;
-  padding: 28px 5vw 96px;
+  padding: 24px 5vw 96px;
 }
 
 .product-directory,
@@ -2808,6 +2862,7 @@ input {
 
 .product-filter-bar {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 
@@ -2826,6 +2881,10 @@ input {
 .product-filter-bar input,
 .product-filter-bar select {
   width: 100%;
+  min-width: 0;
+  background-color: #f8fafc;
+  border-color: #d9e2ef;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .product-watch-filter {
@@ -2839,7 +2898,9 @@ input {
 }
 
 .product-watch-filter input {
-  width: auto;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
 }
 
 .product-directory button {
@@ -2892,7 +2953,7 @@ input {
   display: grid;
   gap: 18px;
   padding: 20px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.1);
 }
 
 .product-detail-head {
