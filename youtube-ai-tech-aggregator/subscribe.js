@@ -25,10 +25,13 @@ function mergeKeywords(...groups) {
 }
 
 function productKeywords() {
+  return mergeKeywords(subscriptionProducts().flatMap((product) => [product.name, ...(product.keywords || [])]));
+}
+
+function subscriptionProducts() {
   const watched = watchlist();
   const requested = requestedProduct();
-  const products = requested && !watched.some((item) => item.id === requested.id) ? [...watched, requested] : watched;
-  return mergeKeywords(products.flatMap((product) => [product.name, ...(product.keywords || [])]));
+  return requested && !watched.some((item) => item.id === requested.id) ? [...watched, requested] : watched;
 }
 
 function renderPreview() {
@@ -63,9 +66,7 @@ function loadPreferences() {
 
 function renderWatchlistPreview() {
   if (!watchlistPreview) return;
-  const watched = watchlist();
-  const requested = requestedProduct();
-  const products = requested && !watched.some((item) => item.id === requested.id) ? [...watched, requested] : watched;
+  const products = subscriptionProducts();
   watchlistPreview.innerHTML = products.length
     ? `
       <div>
@@ -101,7 +102,7 @@ form.addEventListener("submit", (event) => {
       deliveryChannel: deliveryChannel.value,
       keywords: keywordInput.value,
       digestTime: digestTime.value,
-      products: watchlist().map((item) => item.id),
+      products: subscriptionProducts().map((item) => item.id),
     })
   );
   notice.textContent = "订阅偏好已保存，可在“我的账户”查看。";

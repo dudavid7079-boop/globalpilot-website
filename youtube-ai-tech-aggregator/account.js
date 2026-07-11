@@ -2,8 +2,14 @@ const user = window.TechPulseAuth.getCurrentUser();
 const subscription = JSON.parse(localStorage.getItem("techpulse-subscription") || "null");
 const waitlist = JSON.parse(localStorage.getItem("techpulse-waitlist") || "[]");
 const productWatchlist = JSON.parse(localStorage.getItem("techpulse-product-watchlist") || "[]");
+const productState = window.TechPulseProducts || { products: [] };
 const hero = document.querySelector("#accountHero");
 const subscriptionBox = document.querySelector("#accountSubscription");
+
+function subscribedProductNames() {
+  const ids = new Set(subscription?.products || []);
+  return productState.products.filter((product) => ids.has(product.id)).map((product) => product.name);
+}
 
 if (!user) {
   hero.innerHTML = `
@@ -25,6 +31,7 @@ if (!user) {
       <div class="subscription-summary">
         <div><span>推送渠道</span><b>${subscription.deliveryChannel}</b></div>
         <div><span>关键词</span><b>${subscription.keywords}</b></div>
+        <div><span>订阅产品</span><b>${subscribedProductNames().join(" / ") || "按关键词监控"}</b></div>
         <div><span>推送时间</span><b>${subscription.digestTime}</b></div>
       </div>
       <a class="button secondary" href="./subscribe.html" data-analytics-event="account_subscription_click" data-analytics-action="edit">修改订阅</a>
