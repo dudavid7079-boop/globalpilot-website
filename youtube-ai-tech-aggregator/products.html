@@ -42,7 +42,28 @@
         <p>把视频热榜升级为产品实体雷达：每张卡片都聚合产品简介、社区争议、GitHub 状态和海外视频证明。</p>
       </section>
 
-      <section class="product-signal-strip" id="productSignalStrip" aria-label="产品雷达摘要"></section>
+      <section class="product-signal-strip" id="productSignalStrip" aria-label="产品雷达摘要">
+        <article>
+          <span>产品实体</span>
+          <b>05</b>
+          <p>当前产品雷达覆盖 Cursor、Claude Code、MCP、Lovable 等核心 AI 产品。</p>
+        </article>
+        <article>
+          <span>GitHub</span>
+          <b>Live</b>
+          <p>展示相关仓库、stars、forks、最近活跃时间和源码生态变化。</p>
+        </article>
+        <article>
+          <span>Hacker News</span>
+          <b>HN</b>
+          <p>汇总工程师社区讨论、points、comments 和主要争议线索。</p>
+        </article>
+        <article>
+          <span>Video Proof</span>
+          <b>摘要</b>
+          <p>保留海外视频中文摘要作为产品演示证据，而不是依赖直接播放。</p>
+        </article>
+      </section>
 
       <section class="product-workbench">
         <aside class="product-directory" aria-label="AI 产品列表">
@@ -61,9 +82,48 @@
               <span>只看已关注</span>
             </label>
           </div>
-          <div id="productDirectory"></div>
+          <div id="productDirectory">
+            <button class="active" type="button">
+              <b>01</b>
+              <span>
+                <strong>Model Context Protocol</strong>
+                <small>AI Infra · GitHub / HN 信号强</small>
+              </span>
+            </button>
+            <button type="button">
+              <b>02</b>
+              <span>
+                <strong>Cursor</strong>
+                <small>AI Coding · 产品讨论活跃</small>
+              </span>
+            </button>
+            <button type="button">
+              <b>03</b>
+              <span>
+                <strong>Claude Code</strong>
+                <small>AI Agent · 工程师关注高</small>
+              </span>
+            </button>
+          </div>
         </aside>
-        <article class="product-detail" id="productDetail"></article>
+        <article class="product-detail" id="productDetail">
+          <div class="product-detail-head">
+            <div>
+              <span class="section-label">AI Infra</span>
+              <h2>Model Context Protocol</h2>
+              <p>让模型连接工具、数据源和业务系统的开放协议。</p>
+            </div>
+            <div class="signal-score">
+              <span>Signal</span>
+              <b>98</b>
+              <small>GitHub + HN</small>
+            </div>
+          </div>
+          <section class="quick-take">
+            <h3>GitHub / Hacker News 信号</h3>
+            <p>产品雷达会展示相关 GitHub 仓库、stars、forks、最近 push 时间，以及 Hacker News 讨论的 points、comments 和原帖链接。若脚本正常加载，这里会自动替换为实时生成的完整产品情报卡。</p>
+          </section>
+        </article>
       </section>
     </main>
 
@@ -75,8 +135,8 @@
     <script src="./analytics-config.js"></script>
     <script src="./analytics.js"></script>
     <script src="./data-loader.js"></script>
-    <script src="./product-loader.js"></script>
+    <script src="./product-data.generated.js?v=20260712"></script>
     <script src="./auth.js"></script>
-    <script src="./products.js"></script>
+    <script src="./products.js?v=20260712"></script>
   </body>
 </html>

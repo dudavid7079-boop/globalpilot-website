@@ -1,4 +1,5 @@
-const productState = window.TechPulseProducts || { products: [] };
+const productState = window.TechPulseProducts || {};
+productState.products = Array.isArray(productState.products) ? productState.products : [];
 const productVideos = window.TechPulseData?.videos || [];
 const productDirectory = document.querySelector("#productDirectory");
 const productDetail = document.querySelector("#productDetail");
@@ -23,11 +24,14 @@ function saveWatchlist(items) {
 }
 
 function productById(id) {
-  return productState.products.find((product) => product.id === id) || productState.products[0];
+  return productState.products.find((product) => product.id === id) || productState.products[0] || null;
 }
 
 function productHaystack(product) {
-  return [product.name, product.category, product.tagline, product.quickTake, ...(product.keywords || []), ...(product.evidence || [])].join(" ").toLowerCase();
+  return [product.name, product.category, product.tagline, product.quickTake, ...(product.keywords || []), ...(product.evidence || [])]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 }
 
 function filteredProducts() {
@@ -109,13 +113,14 @@ function relatedVideos(product) {
   const keywords = (product.keywords || []).map((keyword) => keyword.toLowerCase());
   return productVideos
     .filter((video) => {
-      const haystack = `${video.topic} ${video.summary} ${video.tags.join(" ")} ${video.channel}`.toLowerCase();
+      const haystack = `${video.topic || ""} ${video.summary || ""} ${(video.tags || []).join(" ")} ${video.channel || ""}`.toLowerCase();
       return ids.has(video.videoId) || keywords.some((keyword) => haystack.includes(keyword));
     })
     .slice(0, 3);
 }
 
 function renderDirectory(activeId) {
+  if (!productDirectory) return;
   const products = filteredProducts();
   const content = products.length
     ? products
@@ -244,6 +249,7 @@ function renderSourceSignals(product) {
 }
 
 function renderDetail(productId) {
+  if (!productDetail) return;
   const products = filteredProducts();
   const requested = productById(productId);
   if (!products.length) {
@@ -261,6 +267,8 @@ function renderDetail(productId) {
   if (!product) return;
   const videos = relatedVideos(product);
   renderDirectory(product.id);
+  const githubSummary = product.github || { detail: product.sourceSignals?.github?.detail || "等待 GitHub 仓库或搜索信号。" };
+  const communitySummary = product.community || { detail: product.sourceSignals?.hackerNews?.detail || "等待 HN 讨论信号。" };
 
   productDetail.innerHTML = `
     <div class="product-detail-head">
@@ -291,10 +299,10 @@ function renderDetail(productId) {
     </section>
 
     <section class="signal-mix">
-      ${metricBlock("GitHub", `${product.sourceMix.github}%`, product.github.detail)}
-      ${metricBlock("社区讨论", `${product.sourceMix.community}%`, product.community.detail)}
-      ${metricBlock("视频证明", `${product.sourceMix.video}%`, videos.length ? "已有可读中文视频摘要，可作为产品实机证明。" : "等待下一轮视频同步。")}
-      ${metricBlock("新鲜度", `${product.sourceMix.freshness}%`, "按最近 24-72 小时新增信号加权。")}
+      ${metricBlock("GitHub", `${product.sourceMix?.github || 0}%`, githubSummary.detail)}
+      ${metricBlock("社区讨论", `${product.sourceMix?.community || 0}%`, communitySummary.detail)}
+      ${metricBlock("视频证明", `${product.sourceMix?.video || 0}%`, videos.length ? "已有可读中文视频摘要，可作为产品实机证明。" : "等待下一轮视频同步。")}
+      ${metricBlock("新鲜度", `${product.sourceMix?.freshness || 0}%`, "按最近 24-72 小时新增信号加权。")}
     </section>
 
     ${renderSourceSignals(product)}
