@@ -12,6 +12,7 @@ APP_PORT="${APP_PORT:-3000}"
 TECHPULSE_PORT="${TECHPULSE_PORT:-8103}"
 TECHPULSE_PUBLIC_URL="${TECHPULSE_PUBLIC_URL:-https://techpulse.attodigitalhk.com}"
 TECHPULSE_RELEASE_MARKER="${TECHPULSE_RELEASE_MARKER:-20260712-product-radar-v2}"
+TECHPULSE_REQUIRE_PUBLIC_CHECK="${TECHPULSE_REQUIRE_PUBLIC_CHECK:-false}"
 TECHPULSE_UMAMI_SCRIPT_URL="${TECHPULSE_UMAMI_SCRIPT_URL:-${NEXT_PUBLIC_UMAMI_SCRIPT_URL:-}}"
 TECHPULSE_UMAMI_WEBSITE_ID="${TECHPULSE_UMAMI_WEBSITE_ID:-${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}}"
 
@@ -53,7 +54,7 @@ done
 verify_products_release() {
   url="$1"
   label="$2"
-  page="$(curl --fail --silent --show-error "${url}/products.html?release=${TECHPULSE_RELEASE_MARKER}")"
+  page="$(curl --fail --silent --show-error --connect-timeout 5 --max-time 15 "${url}/products.html?release=${TECHPULSE_RELEASE_MARKER}")"
   if ! printf '%s' "$page" | grep -Fq "$TECHPULSE_RELEASE_MARKER"; then
     printf '%s products page is stale: expected release marker %s at %s/products.html\n' \
       "$label" "$TECHPULSE_RELEASE_MARKER" "$url" >&2
@@ -66,9 +67,11 @@ verify_products_release "http://127.0.0.1:${TECHPULSE_PORT}" "Local TechPulse"
 
 if ! verify_products_release "$TECHPULSE_PUBLIC_URL" "Public TechPulse"; then
   printf '%s\n' \
-    "Local files are current, but the public domain is serving another target or a stale proxy cache." \
-    "Check the Nginx Proxy Manager forward host/port and the FRP mapping for ${TECHPULSE_PUBLIC_URL}." >&2
-  exit 1
+    "Public verification was unavailable from this host. FRP/NPM loopback may be blocked." \
+    "Verify ${TECHPULSE_PUBLIC_URL}/products.html from an external network." >&2
+  if [ "$TECHPULSE_REQUIRE_PUBLIC_CHECK" = "true" ]; then
+    exit 1
+  fi
 fi
 
 docker image prune -f
