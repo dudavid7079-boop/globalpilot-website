@@ -4,7 +4,6 @@ const seedsPath = process.argv[2] || "pipeline/product-seeds.json";
 const outPath = process.argv[3] || "pipeline/product-signals.real.json";
 const timeoutMs = Number(process.env.PRODUCT_SIGNAL_TIMEOUT_MS || 8000);
 const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
-const productHuntToken = process.env.PRODUCT_HUNT_TOKEN || "";
 
 function readJson(path, fallback) {
   if (!fs.existsSync(path)) return fallback;
@@ -119,69 +118,14 @@ async function collectHackerNews(seed) {
   }
 }
 
-async function collectProductHunt(seed) {
-  if (!productHuntToken) {
-    return { status: "not_configured", posts: [], votes: 0, comments: 0 };
-  }
-  if (!seed.productHuntSlug) {
-    return { status: "not_mapped", posts: [], votes: 0, comments: 0 };
-  }
-
-  try {
-    const data = await fetchJson("https://api.producthunt.com/v2/api/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${productHuntToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-          query TechPulseProduct($slug: String!) {
-            post(slug: $slug) {
-              name
-              tagline
-              votesCount
-              commentsCount
-              url
-              featuredAt
-            }
-          }
-        `,
-        variables: { slug: seed.productHuntSlug },
-      }),
-    });
-    const post = data.data?.post;
-    return post
-      ? {
-          status: "ok",
-          posts: [
-            {
-              name: post.name,
-              tagline: post.tagline,
-              votes: post.votesCount || 0,
-              comments: post.commentsCount || 0,
-              url: post.url,
-              featuredAt: post.featuredAt,
-            },
-          ],
-          votes: post.votesCount || 0,
-          comments: post.commentsCount || 0,
-        }
-      : { status: "empty", posts: [], votes: 0, comments: 0 };
-  } catch (error) {
-    return { status: "error", posts: [], votes: 0, comments: 0, error: error.message };
-  }
-}
-
 async function collectSeed(seed) {
-  const [github, hackerNews, productHunt] = await Promise.all([collectGithub(seed), collectHackerNews(seed), collectProductHunt(seed)]);
+  const [github, hackerNews] = await Promise.all([collectGithub(seed), collectHackerNews(seed)]);
   return compact({
     id: seed.id,
     name: seed.name,
     generatedAt: new Date().toISOString(),
     github,
     hackerNews,
-    productHunt,
   });
 }
 
@@ -195,7 +139,6 @@ const payload = {
   sources: {
     github: "https://api.github.com",
     hackerNews: "https://hn.algolia.com/api/v1",
-    productHunt: productHuntToken ? "https://api.producthunt.com/v2/api/graphql" : "not_configured",
   },
   products,
 };

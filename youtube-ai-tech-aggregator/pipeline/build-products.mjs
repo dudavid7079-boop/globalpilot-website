@@ -59,15 +59,13 @@ function dynamicGithubWeight(seed, signal) {
 function dynamicCommunityWeight(seed, signal) {
   const hnComments = Number(signal.hackerNews?.comments || 0);
   const hnPoints = Number(signal.hackerNews?.points || 0);
-  const phVotes = Number(signal.productHunt?.votes || 0);
-  const boost = Math.min(10, Math.round((hnComments + hnPoints / 5 + phVotes / 30) / 12));
+  const boost = Math.min(10, Math.round((hnComments + hnPoints / 5) / 12));
   return clamp(seed.communityWeight + boost, 5, 36);
 }
 
 function sourceDigest(seed, signal) {
   const github = signal.github || {};
   const hackerNews = signal.hackerNews || {};
-  const productHunt = signal.productHunt || {};
   return {
     github: {
       status: github.status || "seed",
@@ -89,18 +87,6 @@ function sourceDigest(seed, signal) {
       detail: hackerNews.matches
         ? `${hackerNews.matches} 条 HN 讨论，累计 ${hackerNews.comments || 0} 条评论。`
         : seed.communityDetail,
-    },
-    productHunt: {
-      status: productHunt.status || "not_configured",
-      votes: productHunt.votes || 0,
-      comments: productHunt.comments || 0,
-      posts: productHunt.posts || [],
-      detail:
-        productHunt.status === "ok"
-          ? `Product Hunt 累计 ${productHunt.votes || 0} 票、${productHunt.comments || 0} 条评论。`
-          : productHunt.status === "not_configured"
-            ? "Product Hunt 发布信号待接入。"
-            : "暂未匹配到 Product Hunt 发布页。",
     },
   };
 }

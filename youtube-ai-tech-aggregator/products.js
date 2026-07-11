@@ -161,20 +161,84 @@ function sourceSignalCard(label, signal, body) {
   `;
 }
 
+function formatCompactNumber(value) {
+  return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(Number(value || 0));
+}
+
+function renderGithubRepos(github) {
+  const repos = github.repos || [];
+  return repos.length
+    ? repos
+        .slice(0, 3)
+        .map(
+          (repo) => `
+            <a href="${repo.url}" target="_blank" rel="noreferrer" data-analytics-event="product_github_repo_click" data-analytics-action="product_detail" data-destination="${repo.url}">
+              <strong>${repo.name || repo.repo}</strong>
+              <span>${formatCompactNumber(repo.stars)} stars · ${formatCompactNumber(repo.forks)} forks · ${repo.pushedAt ? new Date(repo.pushedAt).toLocaleDateString("zh-CN") : "最近活跃待确认"}</span>
+              <p>${repo.description || "暂无仓库描述。"}</p>
+            </a>
+          `
+        )
+        .join("")
+    : `<div class="empty-state compact-empty"><h3>暂无 GitHub 仓库信号</h3><p>下一轮采集会继续用产品名和关键词匹配相关仓库。</p></div>`;
+}
+
+function renderHackerNewsStories(hackerNews) {
+  const stories = hackerNews.topStories || [];
+  return stories.length
+    ? stories
+        .slice(0, 3)
+        .map(
+          (story) => `
+            <a href="${story.hnUrl || story.url}" target="_blank" rel="noreferrer" data-analytics-event="product_hn_story_click" data-analytics-action="product_detail" data-destination="${story.hnUrl || story.url}">
+              <strong>${story.title}</strong>
+              <span>${story.points || 0} points · ${story.comments || 0} comments · ${story.createdAt ? new Date(story.createdAt).toLocaleDateString("zh-CN") : "时间待确认"}</span>
+            </a>
+          `
+        )
+        .join("")
+    : `<div class="empty-state compact-empty"><h3>暂无 Hacker News 讨论</h3><p>下一轮采集会继续检索 HN 新讨论。</p></div>`;
+}
+
+function renderSourceEvidence(product) {
+  const signals = product.sourceSignals || {};
+  const github = signals.github || {};
+  const hackerNews = signals.hackerNews || {};
+
+  return `
+    <section class="source-evidence">
+      <article>
+        <div class="compact-heading">
+          <span class="section-label">GitHub Signal</span>
+          <h3>源码生态与项目活跃度</h3>
+          <p>${github.detail || "用仓库 stars、forks、issues 和最近 push 时间判断技术生态信号。"}</p>
+        </div>
+        <div class="source-list">${renderGithubRepos(github)}</div>
+      </article>
+      <article>
+        <div class="compact-heading">
+          <span class="section-label">Hacker News Signal</span>
+          <h3>工程师社区讨论</h3>
+          <p>${hackerNews.detail || "用 HN points、comments 和讨论标题判断社区关注点。"}</p>
+        </div>
+        <div class="source-list">${renderHackerNewsStories(hackerNews)}</div>
+      </article>
+    </section>
+  `;
+}
+
 function renderSourceSignals(product) {
   const signals = product.sourceSignals || {};
   const github = signals.github || {};
   const hackerNews = signals.hackerNews || {};
-  const productHunt = signals.productHunt || {};
   const githubLabel = github.topRepo?.name || `${github.repoCount || 0} repos`;
   const hnLabel = `${hackerNews.comments || 0} comments`;
-  const phLabel = productHunt.status === "ok" ? `${productHunt.votes || 0} votes` : productHunt.status === "not_configured" ? "待接入" : "待匹配";
 
   return `
     <section class="source-signal-grid">
       ${sourceSignalCard("GitHub", githubLabel, github.detail || "等待 GitHub 仓库或搜索信号。")}
       ${sourceSignalCard("Hacker News", hnLabel, hackerNews.detail || "等待 HN 讨论信号。")}
-      ${sourceSignalCard("Product Hunt", phLabel, productHunt.detail || "等待 Product Hunt 发布信号。")}
+      ${sourceSignalCard("Video Proof", `${product.videos?.length || 0} videos`, "用海外视频摘要补充产品演示、争议和实机证据。")}
     </section>
   `;
 }
@@ -234,6 +298,8 @@ function renderDetail(productId) {
     </section>
 
     ${renderSourceSignals(product)}
+
+    ${renderSourceEvidence(product)}
 
     <section class="fit-grid">
       <article>

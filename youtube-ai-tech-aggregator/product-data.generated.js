@@ -143,13 +143,6 @@ window.TechPulseProducts = {
             }
           ],
           "detail": "5 条 HN 讨论，累计 94 条评论。"
-        },
-        "productHunt": {
-          "status": "not_configured",
-          "votes": 0,
-          "comments": 0,
-          "posts": [],
-          "detail": "Product Hunt 发布信号待接入。"
         }
       },
       "videos": [
@@ -308,13 +301,6 @@ window.TechPulseProducts = {
             }
           ],
           "detail": "5 条 HN 讨论，累计 12 条评论。"
-        },
-        "productHunt": {
-          "status": "not_configured",
-          "votes": 0,
-          "comments": 0,
-          "posts": [],
-          "detail": "Product Hunt 发布信号待接入。"
         }
       },
       "videos": [
@@ -475,13 +461,6 @@ window.TechPulseProducts = {
             }
           ],
           "detail": "5 条 HN 讨论，累计 13 条评论。"
-        },
-        "productHunt": {
-          "status": "not_configured",
-          "votes": 0,
-          "comments": 0,
-          "posts": [],
-          "detail": "Product Hunt 发布信号待接入。"
         }
       },
       "videos": [
@@ -618,13 +597,6 @@ window.TechPulseProducts = {
             }
           ],
           "detail": "5 条 HN 讨论，累计 27 条评论。"
-        },
-        "productHunt": {
-          "status": "not_configured",
-          "votes": 0,
-          "comments": 0,
-          "posts": [],
-          "detail": "Product Hunt 发布信号待接入。"
         }
       },
       "videos": [
@@ -785,13 +757,6 @@ window.TechPulseProducts = {
             }
           ],
           "detail": "5 条 HN 讨论，累计 4 条评论。"
-        },
-        "productHunt": {
-          "status": "not_configured",
-          "votes": 0,
-          "comments": 0,
-          "posts": [],
-          "detail": "Product Hunt 发布信号待接入。"
         }
       },
       "videos": [

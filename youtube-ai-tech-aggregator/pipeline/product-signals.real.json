@@ -4,8 +4,7 @@
   "timeoutMs": 8000,
   "sources": {
     "github": "https://api.github.com",
-    "hackerNews": "https://hn.algolia.com/api/v1",
-    "productHunt": "not_configured"
+    "hackerNews": "https://hn.algolia.com/api/v1"
   },
   "products": [
     {
@@ -113,12 +112,6 @@
             "hnUrl": "https://news.ycombinator.com/item?id=48768342"
           }
         ]
-      },
-      "productHunt": {
-        "status": "not_configured",
-        "posts": [],
-        "votes": 0,
-        "comments": 0
       }
     },
     {
@@ -202,12 +195,6 @@
             "hnUrl": "https://news.ycombinator.com/item?id=48832797"
           }
         ]
-      },
-      "productHunt": {
-        "status": "not_configured",
-        "posts": [],
-        "votes": 0,
-        "comments": 0
       }
     },
     {
@@ -315,12 +302,6 @@
             "hnUrl": "https://news.ycombinator.com/item?id=48383747"
           }
         ]
-      },
-      "productHunt": {
-        "status": "not_configured",
-        "posts": [],
-        "votes": 0,
-        "comments": 0
       }
     },
     {
@@ -424,12 +405,6 @@
             "hnUrl": "https://news.ycombinator.com/item?id=48548337"
           }
         ]
-      },
-      "productHunt": {
-        "status": "not_configured",
-        "posts": [],
-        "votes": 0,
-        "comments": 0
       }
     },
     {
@@ -537,12 +512,6 @@
             "hnUrl": "https://news.ycombinator.com/item?id=48644519"
           }
         ]
-      },
-      "productHunt": {
-        "status": "not_configured",
-        "posts": [],
-        "votes": 0,
-        "comments": 0
       }
     }
   ]
