@@ -24,6 +24,7 @@ const requiredFiles = [
   "assets/apple-touch-icon.png",
   "assets/og-image.png",
   "pipeline/job-status.json",
+  "pipeline/product-signals.real.json",
   "pipeline/channel-tests.json",
   "pipeline/invidious-status.json"
 ];
@@ -63,7 +64,7 @@ for (const file of requiredFiles) {
   if (!exists(file)) errors.push(`Missing required file: ${file}`);
 }
 
-for (const jsonFile of ["site.webmanifest", "health.json", "pipeline/job-status.json", "pipeline/channel-tests.json", "pipeline/invidious-status.json"]) {
+for (const jsonFile of ["site.webmanifest", "health.json", "pipeline/job-status.json", "pipeline/product-signals.real.json", "pipeline/channel-tests.json", "pipeline/invidious-status.json"]) {
   if (!exists(jsonFile)) continue;
   try {
     JSON.parse(read(jsonFile));

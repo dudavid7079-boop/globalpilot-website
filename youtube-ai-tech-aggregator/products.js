@@ -151,6 +151,34 @@ function metricBlock(label, value, detail) {
   `;
 }
 
+function sourceSignalCard(label, signal, body) {
+  return `
+    <article>
+      <span>${label}</span>
+      <b>${signal}</b>
+      <p>${body}</p>
+    </article>
+  `;
+}
+
+function renderSourceSignals(product) {
+  const signals = product.sourceSignals || {};
+  const github = signals.github || {};
+  const hackerNews = signals.hackerNews || {};
+  const productHunt = signals.productHunt || {};
+  const githubLabel = github.topRepo?.name || `${github.repoCount || 0} repos`;
+  const hnLabel = `${hackerNews.comments || 0} comments`;
+  const phLabel = productHunt.status === "ok" ? `${productHunt.votes || 0} votes` : productHunt.status === "not_configured" ? "待接入" : "待匹配";
+
+  return `
+    <section class="source-signal-grid">
+      ${sourceSignalCard("GitHub", githubLabel, github.detail || "等待 GitHub 仓库或搜索信号。")}
+      ${sourceSignalCard("Hacker News", hnLabel, hackerNews.detail || "等待 HN 讨论信号。")}
+      ${sourceSignalCard("Product Hunt", phLabel, productHunt.detail || "等待 Product Hunt 发布信号。")}
+    </section>
+  `;
+}
+
 function renderDetail(productId) {
   const products = filteredProducts();
   const requested = productById(productId);
@@ -204,6 +232,8 @@ function renderDetail(productId) {
       ${metricBlock("视频证明", `${product.sourceMix.video}%`, videos.length ? "已有可读中文视频摘要，可作为产品实机证明。" : "等待下一轮视频同步。")}
       ${metricBlock("新鲜度", `${product.sourceMix.freshness}%`, "按最近 24-72 小时新增信号加权。")}
     </section>
+
+    ${renderSourceSignals(product)}
 
     <section class="fit-grid">
       <article>

@@ -66,9 +66,20 @@ The refresh script runs:
 
 ```text
 youtube-ai-tech-aggregator/pipeline/run-real-preview.mjs
+youtube-ai-tech-aggregator/pipeline/collect-product-signals.mjs
 youtube-ai-tech-aggregator/pipeline/build-products.mjs
 youtube-ai-tech-aggregator/npm run prelaunch
 ```
+
+`collect-product-signals.mjs` fetches GitHub, Hacker News, and optional Product Hunt signals for the product radar. Add these to `/opt/globalpilot/.env.production` when available:
+
+```bash
+GITHUB_TOKEN=...
+PRODUCT_HUNT_TOKEN=...
+PRODUCT_SIGNAL_TIMEOUT_MS=8000
+```
+
+`GITHUB_TOKEN` is optional but improves GitHub API rate limits. `PRODUCT_HUNT_TOKEN` is required only for Product Hunt launch/vote/comment data; without it, the site still publishes GitHub, HN, and video signals.
 
 The VM does not need host Node.js installed. If `node` and `npm` are not available on the host, the script runs the same commands inside `node:22-alpine` with Docker.
 
@@ -77,6 +88,7 @@ It updates:
 ```text
 youtube-ai-tech-aggregator/data.generated.js
 youtube-ai-tech-aggregator/product-data.generated.js
+youtube-ai-tech-aggregator/pipeline/product-signals.real.json
 youtube-ai-tech-aggregator/pipeline/job-status.json
 youtube-ai-tech-aggregator/pipeline/daily-digest.real.json
 ```

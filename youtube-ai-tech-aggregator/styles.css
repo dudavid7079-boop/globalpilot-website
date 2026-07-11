@@ -2981,6 +2981,7 @@ input {
 }
 
 .signal-mix,
+.source-signal-grid,
 .fit-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2988,20 +2989,33 @@ input {
 }
 
 .signal-mix article,
+.source-signal-grid article,
 .fit-grid article {
   padding: 18px;
 }
 
-.signal-mix span {
+.signal-mix span,
+.source-signal-grid span {
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
 }
 
-.signal-mix b {
+.signal-mix b,
+.source-signal-grid b {
   display: block;
   margin: 8px 0;
   font-size: 30px;
+}
+
+.source-signal-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.source-signal-grid p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.65;
 }
 
 .fit-grid {
@@ -3047,6 +3061,7 @@ input {
   .product-signal-strip,
   .product-workbench,
   .signal-mix,
+  .source-signal-grid,
   .fit-grid {
     grid-template-columns: 1fr;
   }

@@ -3,6 +3,7 @@ import fs from "node:fs";
 const seedsPath = process.argv[2] || "pipeline/product-seeds.json";
 const siteDataPath = process.argv[3] || "data.generated.js";
 const outPath = process.argv[4] || "product-data.generated.js";
+const signalsPath = process.argv[5] || "pipeline/product-signals.real.json";
 
 function readJson(path, fallback) {
   if (!fs.existsSync(path)) return fallback;
@@ -43,13 +44,77 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-function buildProduct(seed, videos) {
+function signalFor(signals, seed) {
+  return (signals.products || []).find((product) => product.id === seed.id) || {};
+}
+
+function dynamicGithubWeight(seed, signal) {
+  const stars = Number(signal.github?.stars || 0);
+  const repoCount = Number(signal.github?.repoCount || 0);
+  const boost = stars ? Math.min(8, Math.round(Math.log10(stars + 1) * 2)) : 0;
+  const repoBoost = repoCount > 1 ? 2 : repoCount === 1 ? 1 : 0;
+  return clamp(seed.githubWeight + boost + repoBoost, 5, 38);
+}
+
+function dynamicCommunityWeight(seed, signal) {
+  const hnComments = Number(signal.hackerNews?.comments || 0);
+  const hnPoints = Number(signal.hackerNews?.points || 0);
+  const phVotes = Number(signal.productHunt?.votes || 0);
+  const boost = Math.min(10, Math.round((hnComments + hnPoints / 5 + phVotes / 30) / 12));
+  return clamp(seed.communityWeight + boost, 5, 36);
+}
+
+function sourceDigest(seed, signal) {
+  const github = signal.github || {};
+  const hackerNews = signal.hackerNews || {};
+  const productHunt = signal.productHunt || {};
+  return {
+    github: {
+      status: github.status || "seed",
+      repoCount: github.repoCount || 0,
+      stars: github.stars || 0,
+      forks: github.forks || 0,
+      topRepo: github.topRepo || null,
+      repos: github.repos || [],
+      detail: github.repoCount
+        ? `${github.repoCount} 个相关仓库，累计 ${github.stars || 0} stars。`
+        : seed.githubDetail,
+    },
+    hackerNews: {
+      status: hackerNews.status || "seed",
+      matches: hackerNews.matches || 0,
+      points: hackerNews.points || 0,
+      comments: hackerNews.comments || 0,
+      topStories: hackerNews.topStories || [],
+      detail: hackerNews.matches
+        ? `${hackerNews.matches} 条 HN 讨论，累计 ${hackerNews.comments || 0} 条评论。`
+        : seed.communityDetail,
+    },
+    productHunt: {
+      status: productHunt.status || "not_configured",
+      votes: productHunt.votes || 0,
+      comments: productHunt.comments || 0,
+      posts: productHunt.posts || [],
+      detail:
+        productHunt.status === "ok"
+          ? `Product Hunt 累计 ${productHunt.votes || 0} 票、${productHunt.comments || 0} 条评论。`
+          : productHunt.status === "not_configured"
+            ? "Product Hunt 发布信号待接入。"
+            : "暂未匹配到 Product Hunt 发布页。",
+    },
+  };
+}
+
+function buildProduct(seed, videos, signal) {
   const matched = matchVideos(seed, videos);
   const proofVideos = matched.length ? matched : fallbackVideoProof(seed, videos);
   const videoBuzzRaw = proofVideos.reduce((sum, video) => sum + scoreVideo(video), 0);
   const videoWeight = clamp(Math.round(videoBuzzRaw / 1200), 12, 35);
   const freshnessBoost = proofVideos.some((video) => Number(video.publishedHours || 99) <= 24) ? 8 : 3;
-  const signalScore = clamp(seed.githubWeight + seed.communityWeight + videoWeight + seed.freshnessWeight + freshnessBoost, 45, 98);
+  const githubWeight = dynamicGithubWeight(seed, signal);
+  const communityWeight = dynamicCommunityWeight(seed, signal);
+  const sourceSignals = sourceDigest(seed, signal);
+  const signalScore = clamp(githubWeight + communityWeight + videoWeight + seed.freshnessWeight + freshnessBoost, 45, 98);
   const trend = signalScore >= 88 ? "+18" : signalScore >= 80 ? "+11" : "+6";
   const videoIds = proofVideos.map((video) => video.videoId).filter(Boolean);
 
@@ -61,22 +126,23 @@ function buildProduct(seed, videos) {
     signalScore,
     signalTrend: trend,
     sourceMix: {
-      github: seed.githubWeight,
-      community: seed.communityWeight,
+      github: githubWeight,
+      community: communityWeight,
       video: videoWeight,
       freshness: seed.freshnessWeight,
     },
     evidence: [
-      seed.githubWeight >= 25 ? "GitHub 生态强" : "生态信号待跟踪",
-      seed.communityWeight >= 25 ? "社区讨论活跃" : "社区观点持续采样",
+      githubWeight >= 25 ? "GitHub 生态强" : "生态信号待跟踪",
+      communityWeight >= 25 ? "社区讨论活跃" : "社区观点持续采样",
       videoIds.length ? `${videoIds.length} 条视频证明` : "等待视频证明",
     ],
     quickTake: seed.quickTake,
     bestFor: seed.bestFor,
     notFor: seed.notFor,
     risks: seed.risks,
-    github: { label: "技术生态", value: seed.githubWeight >= 25 ? "强信号" : "观察中", detail: seed.githubDetail },
-    community: { label: "社区观点", value: seed.communityWeight >= 25 ? "高讨论" : "持续采样", detail: seed.communityDetail },
+    github: { label: "技术生态", value: githubWeight >= 25 ? "强信号" : "观察中", detail: sourceSignals.github.detail },
+    community: { label: "社区观点", value: communityWeight >= 25 ? "高讨论" : "持续采样", detail: sourceSignals.hackerNews.detail },
+    sourceSignals,
     videos: videoIds,
     keywords: seed.keywords,
   };
@@ -84,11 +150,13 @@ function buildProduct(seed, videos) {
 
 const seeds = readJson(seedsPath, []);
 const siteData = readSiteData(siteDataPath);
-const products = seeds.map((seed) => buildProduct(seed, siteData.videos || [])).sort((a, b) => b.signalScore - a.signalScore);
+const signals = readJson(signalsPath, { products: [] });
+const products = seeds.map((seed) => buildProduct(seed, siteData.videos || [], signalFor(signals, seed))).sort((a, b) => b.signalScore - a.signalScore);
 
 const js = `window.TechPulseProducts = ${JSON.stringify(
   {
     generatedAt: siteData.generatedAt || new Date().toISOString(),
+    signalGeneratedAt: signals.generatedAt || null,
     products,
   },
   null,
