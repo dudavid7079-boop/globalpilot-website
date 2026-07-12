@@ -37,8 +37,7 @@ const requiredHeadSnippets = [
   'property="og:image"',
   'name="twitter:image"',
   'rel="canonical"',
-  'property="og:url"',
-  'href="./styles.css"'
+  'property="og:url"'
 ];
 
 const errors = [];
@@ -79,6 +78,10 @@ for (const file of htmlFiles) {
   const html = read(file);
   for (const snippet of requiredHeadSnippets) {
     if (!html.includes(snippet)) errors.push(`${file} missing head snippet: ${snippet}`);
+  }
+
+  if (!/href=["']\.\/styles\.css(?:\?[^"']+)?["']/.test(html)) {
+    errors.push(`${file} missing stylesheet link: ./styles.css`);
   }
 
   const matches = html.matchAll(/\b(?:href|src)=["']([^"']+)["']/g);
