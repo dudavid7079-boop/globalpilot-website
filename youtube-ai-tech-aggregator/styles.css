@@ -2727,15 +2727,15 @@ input {
 }
 
 .product-card-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 9px;
   margin-top: 16px;
 }
 
 .product-card-actions button,
 .product-card-actions a {
-  min-width: 116px;
+  width: 100%;
   min-height: 38px;
   display: inline-flex;
   align-items: center;
@@ -3211,6 +3211,10 @@ input {
   }
 
   .product-radar-card {
+    grid-template-columns: 1fr;
+  }
+
+  .product-card-actions {
     grid-template-columns: 1fr;
   }
 
