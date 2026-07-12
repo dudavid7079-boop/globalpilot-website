@@ -2735,6 +2735,7 @@ input {
 
 .product-card-actions button,
 .product-card-actions a {
+  min-width: 116px;
   min-height: 38px;
   display: inline-flex;
   align-items: center;
@@ -2753,6 +2754,10 @@ input {
   color: white;
   background: var(--blue);
   border-color: var(--blue);
+}
+
+.product-card-actions .detail-link {
+  margin-top: 0;
 }
 
 .radar-footer-action {
