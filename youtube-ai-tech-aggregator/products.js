@@ -1,5 +1,4 @@
-const productState = window.TechPulseProducts || {};
-productState.products = Array.isArray(productState.products) ? productState.products : [];
+let productState = { products: [] };
 const productVideos = window.TechPulseData?.videos || [];
 const productDirectory = document.querySelector("#productDirectory");
 const productDetail = document.querySelector("#productDetail");
@@ -388,7 +387,14 @@ productDetail?.addEventListener("click", (event) => {
   renderDetail(product.id);
 });
 
-const initialProductId = new URLSearchParams(location.search).get("id");
-renderCategoryOptions();
-renderSignalStrip();
-renderDetail(initialProductId);
+async function initProductsPage() {
+  const loaded = await (window.TechPulseProductsReady || Promise.resolve(window.TechPulseProducts || { products: [] }));
+  productState = loaded || { products: [] };
+  productState.products = Array.isArray(productState.products) ? productState.products : [];
+  const initialProductId = new URLSearchParams(location.search).get("id");
+  renderCategoryOptions();
+  renderSignalStrip();
+  renderDetail(initialProductId);
+}
+
+initProductsPage();

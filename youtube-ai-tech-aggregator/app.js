@@ -1,7 +1,6 @@
 const { videos, channels } = window.TechPulseData;
 const { scoreVideo, formatNumber } = window.TechPulseUtils;
-const productState = window.TechPulseProducts || { products: [] };
-productState.products = Array.isArray(productState.products) ? productState.products : [];
+let productState = { products: [] };
 
 const topicList = document.querySelector("#topicList");
 const categoryFilter = document.querySelector("#categoryFilter");
@@ -143,6 +142,13 @@ function renderProductRadar() {
     .join("");
   const statProducts = document.querySelector("#statProducts");
   if (statProducts) statProducts.textContent = String(productState.products.length).padStart(2, "0");
+}
+
+async function initProductRadar() {
+  const loaded = await (window.TechPulseProductsReady || Promise.resolve(window.TechPulseProducts || { products: [] }));
+  productState = loaded || { products: [] };
+  productState.products = Array.isArray(productState.products) ? productState.products : [];
+  renderProductRadar();
 }
 
 function isInvidiousHealthy() {
@@ -331,6 +337,6 @@ productRadar?.addEventListener("click", (event) => {
 });
 
 renderChannels();
-renderProductRadar();
 renderTopics();
 initStatus();
+initProductRadar();
