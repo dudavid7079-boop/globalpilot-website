@@ -13,5 +13,5 @@
   const file = source === "generated" ? "data.generated.js" : "data.js";
 
   window.TechPulseDataSource = source;
-  document.write(`<script src="./${file}"><\\/script>`);
+  document.write(`<script src="./${file}"></scr` + `ipt>`);
 })();
