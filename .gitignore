@@ -20,5 +20,6 @@ youtube-ai-tech-aggregator/pipeline/channel-tests.json
 youtube-ai-tech-aggregator/pipeline/daily-digest.real.json
 youtube-ai-tech-aggregator/pipeline/discovered.real.json
 youtube-ai-tech-aggregator/pipeline/job-status.json
+youtube-ai-tech-aggregator/pipeline/refresh-status.json
 youtube-ai-tech-aggregator/pipeline/product-seeds.generated.json
 youtube-ai-tech-aggregator/pipeline/product-signals.real.json

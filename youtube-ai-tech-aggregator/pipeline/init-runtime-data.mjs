@@ -31,6 +31,12 @@ jsonIfMissing("pipeline/job-status.json", {
   finishedAt: null,
   topicCount: 0,
 });
+jsonIfMissing("pipeline/refresh-status.json", {
+  status: "initialized",
+  stage: "initialization",
+  finishedAt: null,
+  usingPreviousRelease: false,
+});
 jsonIfMissing("pipeline/product-signals.real.json", {
   generatedAt: null,
   sources: {},

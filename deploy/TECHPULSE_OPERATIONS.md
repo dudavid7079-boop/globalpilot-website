@@ -68,6 +68,7 @@ Check status:
 systemctl list-timers techpulse-refresh.timer --no-pager
 systemctl status techpulse-refresh.service --no-pager
 journalctl -u techpulse-refresh.service -n 100 --no-pager
+cat /opt/globalpilot/youtube-ai-tech-aggregator/pipeline/refresh-status.json
 ```
 
 The refresh script runs:
@@ -97,8 +98,11 @@ youtube-ai-tech-aggregator/data.generated.js
 youtube-ai-tech-aggregator/product-data.generated.js
 youtube-ai-tech-aggregator/pipeline/product-signals.real.json
 youtube-ai-tech-aggregator/pipeline/job-status.json
+youtube-ai-tech-aggregator/pipeline/refresh-status.json
 youtube-ai-tech-aggregator/pipeline/daily-digest.real.json
 ```
+
+The refresh is transactional for public data files. If video discovery, product discovery, signal collection, product generation, or validation fails, the script restores the previous working release. `refresh-status.json` records the failed stage and sets `usingPreviousRelease` to `true`; the homepage also shows this condition in its data status panel.
 
 Because TechPulse is mounted into the static container from the host directory, no container restart is required after the JSON/JS data refresh.
 

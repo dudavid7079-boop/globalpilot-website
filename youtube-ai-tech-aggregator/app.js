@@ -72,19 +72,24 @@ function formatDateTime(iso) {
   return new Date(iso).toLocaleString("zh-CN", { hour12: false });
 }
 
-function renderPipelineStatus(jobStatus, channelTests) {
+function renderPipelineStatus(jobStatus, channelTests, refreshStatus) {
   if (!pipelineStatus) return;
   const sourceLabel = window.TechPulseDataSource === "generated" ? "Pipeline 生成数据" : "Demo 演示数据";
   const modeLabel = jobStatus?.mode === "youtube-api" ? "YouTube API 精准指标" : jobStatus?.mode === "estimated" ? "估算预览指标" : "静态数据";
   const refreshedAt = jobStatus?.finishedAt || window.TechPulseData.generatedAt;
   const channelHealth = channelTests ? `${channelTests.okCount}/${channelTests.count} 来源可用` : "来源持续巡检";
   const failedCount = channelTests ? Math.max(0, channelTests.count - channelTests.okCount) : 0;
+  const refreshFailed = refreshStatus?.status === "failed";
+  const refreshNotice = refreshFailed
+    ? `<p class="pipeline-warning">最近一次完整刷新在 ${refreshStatus.stage || "未知阶段"} 失败，当前继续使用上一版有效数据。</p>`
+    : "";
 
   pipelineStatus.innerHTML = `
     <div>
       <span class="section-label">Data Status</span>
       <strong>${sourceLabel}</strong>
       <p>${modeLabel} · 最近刷新 ${formatDateTime(refreshedAt)}</p>
+      ${refreshNotice}
     </div>
     <div class="home-status-metrics">
       <a href="./topics.html?source=${window.TechPulseDataSource}">
@@ -299,13 +304,14 @@ function renderChannels() {
 }
 
 async function initStatus() {
-  const [jobStatus, channelTests, playbackStatus] = await Promise.all([
+  const [jobStatus, channelTests, playbackStatus, refreshStatus] = await Promise.all([
     readJson("./pipeline/job-status.json"),
     readJson("./pipeline/channel-tests.json"),
-    readJson(playbackConfig.statusPath || "./pipeline/invidious-status.json")
+    readJson(playbackConfig.statusPath || "./pipeline/invidious-status.json"),
+    readJson("./pipeline/refresh-status.json")
   ]);
   invidiousStatus = playbackStatus;
-  renderPipelineStatus(jobStatus, channelTests);
+  renderPipelineStatus(jobStatus, channelTests, refreshStatus);
   const activeCard = document.querySelector(".topic-card.active");
   if (activeCard) selectVideo(activeCard.dataset.videoId);
 }
