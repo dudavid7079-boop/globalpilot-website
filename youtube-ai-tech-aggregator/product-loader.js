@@ -3,5 +3,6 @@
   const requested = params.get("source");
   const source = requested === "demo" || requested === "generated" ? requested : window.TechPulseDataSource || "generated";
   const file = source === "generated" ? "product-data.generated.js" : "product-data.js";
-  document.write(`<script src="./${file}"><\\/script>`);
+  const cacheKey = source === "generated" ? Math.floor(Date.now() / 300000) : "demo";
+  document.write(`<script src="./${file}?v=${cacheKey}"><\\/script>`);
 })();
