@@ -75,6 +75,7 @@ The refresh script runs:
 
 ```text
 youtube-ai-tech-aggregator/pipeline/run-real-preview.mjs
+youtube-ai-tech-aggregator/pipeline/discover-products.mjs
 youtube-ai-tech-aggregator/pipeline/collect-product-signals.mjs
 youtube-ai-tech-aggregator/pipeline/build-products.mjs
 youtube-ai-tech-aggregator/npm run prelaunch
@@ -85,9 +86,16 @@ youtube-ai-tech-aggregator/npm run prelaunch
 ```bash
 GITHUB_TOKEN=...
 PRODUCT_SIGNAL_TIMEOUT_MS=8000
+PRODUCT_DISCOVERY_LIMIT=20
+PRODUCT_DISCOVERY_AUTOMATIC_LIMIT=10
+PRODUCT_DISCOVERY_MIN_AUTOMATIC=3
+PRODUCT_DISCOVERY_MIN_QUALITY=45
+PRODUCT_DISCOVERY_MIN_STARS=100
 ```
 
 `GITHUB_TOKEN` is optional but improves GitHub API rate limits. The current 2.0 MVP focuses on GitHub, HN, and video signals.
+
+Product discovery now applies a product-quality gate before items enter the public radar. It blocks tutorials, resource lists, prompt collections, deepfake/security-sensitive tools, generic infrastructure, thin demo repositories, and whimsical toy projects. Raise `PRODUCT_DISCOVERY_MIN_QUALITY` for a stricter radar; raise `PRODUCT_DISCOVERY_AUTOMATIC_LIMIT` only after the added products look useful enough for customers. If GitHub/HN fails and fewer than `PRODUCT_DISCOVERY_MIN_AUTOMATIC` automatic products are found, the refresh exits non-zero so the transactional release script keeps the previous public data.
 
 The VM does not need host Node.js installed. If `node` and `npm` are not available on the host, the script runs the same commands inside `node:22-alpine` with Docker.
 

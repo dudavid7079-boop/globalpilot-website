@@ -3,10 +3,19 @@ import fs from "node:fs";
 const seedsPath = process.argv[2] || "pipeline/product-seeds.json";
 const outPath = process.argv[3] || "pipeline/product-seeds.generated.json";
 const limit = Number(process.env.PRODUCT_DISCOVERY_LIMIT || 20);
+const automaticLimit = Number(process.env.PRODUCT_DISCOVERY_AUTOMATIC_LIMIT || 10);
+const minAutomatic = Number(process.env.PRODUCT_DISCOVERY_MIN_AUTOMATIC || Math.min(3, automaticLimit));
+const minQualityScore = Number(process.env.PRODUCT_DISCOVERY_MIN_QUALITY || 45);
 const minStars = Number(process.env.PRODUCT_DISCOVERY_MIN_STARS || 100);
 const lookbackDays = Number(process.env.PRODUCT_DISCOVERY_LOOKBACK_DAYS || 21);
 const timeoutMs = Number(process.env.PRODUCT_SIGNAL_TIMEOUT_MS || 8000);
 const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
+
+const hardExcludePattern = /\b(awesome|tutorial|course|curriculum|beginners?|from scratch|roadmap|interview|book|cheatsheet|papers|learning resources|security training|system prompts|resource list|collection of|prompt collection|deepfake|face swap|penetration testing|red team|exploit|malware|jailbreak|laziest|whimsy|reddit community ninjas?)\b/i;
+const weakSignalPattern = /\b(template|boilerplate|demo|example|starter|toy|sample|plugin list|theme|wallpaper|landing page)\b/i;
+const genericInfraPattern = /\b(api gateway|gateway|kubernetes|database|proxy|monitoring|observability|logging|load balancer|message queue)\b/i;
+const aiPattern = /\b(ai|artificial intelligence|llm|large language model|agent|agents|agentic|rag|retrieval|inference|copilot|mcp|model context|genai|generative|machine learning|ml|neural)\b/i;
+const productPattern = /\b(app|platform|agent|assistant|ide|copilot|workflow|builder|search|studio|browser|runtime|cli|protocol|server|sdk|automation|orchestration)\b/i;
 
 function readJson(path, fallback) {
   if (!fs.existsSync(path)) return fallback;
@@ -36,6 +45,20 @@ function title(value) {
   return value.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function displayNameFor(value) {
+  const key = slug(value);
+  const knownNames = {
+    autogpt: "AutoGPT",
+    "browser-use": "Browser Use",
+    "gemini-cli": "Gemini CLI",
+    llamafactory: "LlamaFactory",
+    lobehub: "LobeHub",
+    openbb: "OpenBB",
+    ragflow: "RAGFlow",
+  };
+  return knownNames[key] || title(value);
+}
+
 function categoryFor(repo) {
   const text = `${repo.name} ${repo.description || ""} ${(repo.topics || []).join(" ")}`.toLowerCase();
   if (/code|coding|developer|ide/.test(text)) return "AI Coding";
@@ -45,10 +68,42 @@ function categoryFor(repo) {
   return "AI Infra";
 }
 
-function seedFromRepo(repo, hn = null) {
+function qualityFor(repo, hn = null) {
+  const text = `${repo.name || ""} ${repo.description || ""} ${(repo.topics || []).join(" ")}`.toLowerCase();
+  const stars = Number(repo.stargazers_count || repo.stars || 0);
+  let score = 0;
+  const reasons = [];
+
+  if (hardExcludePattern.test(text)) return { score: 0, tier: "blocked", reasons: ["hard-excluded"] };
+  if (aiPattern.test(text)) {
+    score += 25;
+    reasons.push("ai-signal");
+  }
+  if (productPattern.test(text)) {
+    score += 16;
+    reasons.push("product-shape");
+  }
+  if (hn) {
+    score += 18;
+    reasons.push("hn-discussion");
+  }
+  if (!repo.fork && !repo.archived) score += 10;
+  if (repo.homepage) score += 6;
+  if (repo.description && repo.description.length >= 36 && repo.description.length <= 260) score += 8;
+  score += Math.min(14, Math.round(Math.log10(stars + 1) * 3));
+
+  if (weakSignalPattern.test(text)) score -= 18;
+  if (genericInfraPattern.test(text)) score -= aiPattern.test(text) ? 18 : 35;
+  if (!aiPattern.test(text) && !hn) score -= 28;
+
+  const tier = score >= 72 ? "strong" : score >= 55 ? "watch" : score >= minQualityScore ? "thin" : "reject";
+  return { score, tier, reasons };
+}
+
+function seedFromRepo(repo, hn = null, quality = qualityFor(repo, hn)) {
   const repoName = repo.full_name || repo.repo;
   const shortName = repo.name || repoName.split("/").pop();
-  const displayName = title(shortName);
+  const displayName = displayNameFor(shortName);
   const topics = (repo.topics || []).slice(0, 4);
   const stars = Number(repo.stargazers_count || repo.stars || 0);
   return {
@@ -68,6 +123,9 @@ function seedFromRepo(repo, hn = null) {
     risks: ["项目成熟度", "维护持续性", "实际采用率仍需验证"],
     githubDetail: `${repoName} 当前约 ${stars} stars。`,
     communityDetail: hn ? `Hacker News 出现相关讨论：${hn.title}` : "等待更多 Hacker News 讨论验证。",
+    qualityScore: quality.score,
+    qualityTier: quality.tier,
+    qualityReasons: quality.reasons,
     discovered: true,
   };
 }
@@ -79,10 +137,10 @@ function repoFromGithubUrl(url) {
 
 function isProductRepo(repo, hn) {
   const text = `${repo.name || ""} ${repo.description || ""} ${(repo.topics || []).join(" ")}`.toLowerCase();
-  const excluded = /\b(awesome|tutorial|course|curriculum|beginners?|from scratch|roadmap|interview|book|cheatsheet|papers|learning resources|security training|system prompts|resource list|collection of)\b/;
-  if (excluded.test(text)) return false;
-  if (hn) return true;
-  return !repo.fork && !repo.archived && Boolean(repo.description);
+  if (!repo.description && !hn) return false;
+  if (repo.fork || repo.archived) return false;
+  if (hardExcludePattern.test(text)) return false;
+  return qualityFor(repo, hn).score >= minQualityScore;
 }
 
 const cutoff = new Date(Date.now() - lookbackDays * 86400000);
@@ -130,9 +188,20 @@ for (const story of hnStories) {
 const manualNames = new Set(manualSeeds.flatMap((seed) => [seed.id, seed.name, ...(seed.githubRepos || [])].map((item) => slug(item))));
 const discovered = [...repoMap.values()]
   .filter(({ repo, hn }) => isProductRepo(repo, hn))
-  .map(({ repo, hn }) => seedFromRepo(repo, hn))
+  .map(({ repo, hn }) => seedFromRepo(repo, hn, qualityFor(repo, hn)))
   .filter((seed) => !manualNames.has(slug(seed.id)) && !(seed.githubRepos || []).some((repo) => manualNames.has(slug(repo))))
-  .sort((a, b) => b.githubWeight + b.communityWeight - (a.githubWeight + a.communityWeight));
+  .sort((a, b) => {
+    const scoreDelta = (b.qualityScore || 0) - (a.qualityScore || 0);
+    if (scoreDelta) return scoreDelta;
+    return b.githubWeight + b.communityWeight - (a.githubWeight + a.communityWeight);
+  })
+  .slice(0, automaticLimit);
+
+if (errors.length && discovered.length < minAutomatic) {
+  console.error(`Product discovery found only ${discovered.length} automatic products; keeping previous release.`);
+  console.error(errors.join("\n"));
+  process.exit(1);
+}
 
 const seeds = [...manualSeeds, ...discovered].slice(0, Math.max(manualSeeds.length, limit));
 fs.writeFileSync(outPath, `${JSON.stringify(seeds, null, 2)}\n`);
