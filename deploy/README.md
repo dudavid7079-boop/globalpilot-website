@@ -51,7 +51,7 @@ curl -i http://127.0.0.1:3000/api/health
 同时启动 TechPulse 静态站：
 
 ```bash
-TECHPULSE_BIND=127.0.0.1 TECHPULSE_PORT=8103 docker compose -f compose.techpulse.yml --env-file .env.production up -d
+./deploy/vm-deploy-techpulse.sh
 docker compose -f compose.techpulse.yml --env-file .env.production ps
 curl -I http://127.0.0.1:8103/health.json
 ```
@@ -192,7 +192,7 @@ Nginx Proxy Manager 模式下，TechPulse 单独查看：
 cd /opt/globalpilot
 docker compose -f compose.techpulse.yml ps
 docker compose -f compose.techpulse.yml logs --tail=100 techpulse
-docker compose -f compose.techpulse.yml --env-file .env.production up -d
+./deploy/vm-deploy-techpulse.sh
 ```
 
 不要把 `.env.production`、SSH 私钥或 Ollama 的 11434 端口公开到 GitHub/公网。

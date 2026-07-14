@@ -1,3 +1,5 @@
+name: techpulse
+
 services:
   techpulse:
     image: caddy:2-alpine

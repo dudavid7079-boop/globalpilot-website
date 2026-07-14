@@ -58,7 +58,25 @@ VM:3001 Umami
 Umami Dashboard
 ```
 
-### 1.3 已完成模块
+### 1.3 当前端口分配
+
+```text
+GlobalPilot 主站：3000
+Umami 访问统计：3001
+TechPulse 静态站：8103
+```
+
+Nginx Proxy Manager 按域名转发：
+
+```text
+globalpilot.attodigitalhk.com             -> VM:3000
+analytics.globalpilot.attodigitalhk.com   -> VM:3001
+techpulse.attodigitalhk.com               -> VM:8103
+```
+
+GlobalPilot 和 TechPulse 分开部署：`deploy/vm-deploy-npm.sh` 只部署 GlobalPilot，`deploy/vm-deploy-techpulse.sh` 只部署 TechPulse。不要在 GlobalPilot 部署脚本里启动 TechPulse，否则可能和已有的 `techpulse-techpulse-1` 容器抢占 `8103`。
+
+### 1.4 已完成模块
 
 - Next.js 个人品牌网站
 - 首页、About、Services、Service Detail、Blog、Article Detail、Chat 页面

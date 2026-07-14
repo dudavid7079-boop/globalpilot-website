@@ -260,18 +260,18 @@ compose.npm.yml       -> GlobalPilot Next.js，端口 3000
 compose.techpulse.yml -> TechPulse 静态站，端口 8103
 ```
 
-自动部署脚本 `deploy/vm-deploy-npm.sh` 会同时启动两者，并分别检查：
+GlobalPilot 和 TechPulse 分开部署，避免两个 Compose project 抢占同一个 TechPulse 端口：
 
 ```text
-http://127.0.0.1:3000/api/health
-http://127.0.0.1:8103/health.json
+deploy/vm-deploy-npm.sh       -> 只部署 GlobalPilot，检查 http://127.0.0.1:3000/api/health
+deploy/vm-deploy-techpulse.sh -> 只部署 TechPulse，检查 http://127.0.0.1:8103/health.json
 ```
 
 手动启动 TechPulse：
 
 ```bash
 cd /opt/globalpilot
-TECHPULSE_BIND=127.0.0.1 TECHPULSE_PORT=8103 docker compose -f compose.techpulse.yml --env-file .env.production up -d
+./deploy/vm-deploy-techpulse.sh
 ```
 
 然后在 NPM 添加：
