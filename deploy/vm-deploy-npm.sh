@@ -3,6 +3,18 @@ set -eu
 
 APP_PORT="${APP_PORT:-3000}"
 
+if [ -f .env.production ]; then
+  set -a
+  # shellcheck disable=SC1091
+  . ./.env.production
+  set +a
+fi
+
+if [ -n "${NEXT_PUBLIC_UMAMI_SCRIPT_URL:-}" ] && [ -z "${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}" ]; then
+  printf '%s\n' "NEXT_PUBLIC_UMAMI_SCRIPT_URL is set but NEXT_PUBLIC_UMAMI_WEBSITE_ID is empty. Refusing to deploy without analytics tracking." >&2
+  exit 1
+fi
+
 docker compose -f compose.npm.yml --env-file .env.production up -d --build
 docker compose -f compose.npm.yml --env-file .env.production ps
 
