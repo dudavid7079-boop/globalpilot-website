@@ -2,8 +2,12 @@
 set -eu
 
 GLOBALPILOT_ENV_FILE="${GLOBALPILOT_ENV_FILE:-${ENV_FILE:-.env.globalpilot}}"
+case "$GLOBALPILOT_ENV_FILE" in
+  /*|./*|../*) ;;
+  *) GLOBALPILOT_ENV_FILE="./${GLOBALPILOT_ENV_FILE}" ;;
+esac
 if [ ! -f "$GLOBALPILOT_ENV_FILE" ] && [ -f .env.production ]; then
-  GLOBALPILOT_ENV_FILE=".env.production"
+  GLOBALPILOT_ENV_FILE="./.env.production"
 fi
 
 if [ ! -f "$GLOBALPILOT_ENV_FILE" ]; then

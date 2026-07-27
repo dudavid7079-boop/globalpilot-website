@@ -2,8 +2,12 @@
 set -eu
 
 TECHPULSE_ENV_FILE="${TECHPULSE_ENV_FILE:-.env.techpulse}"
+case "$TECHPULSE_ENV_FILE" in
+  /*|./*|../*) ;;
+  *) TECHPULSE_ENV_FILE="./${TECHPULSE_ENV_FILE}" ;;
+esac
 if [ ! -f "$TECHPULSE_ENV_FILE" ] && [ -f .env.production ]; then
-  TECHPULSE_ENV_FILE=".env.production"
+  TECHPULSE_ENV_FILE="./.env.production"
 fi
 
 if [ ! -f "$TECHPULSE_ENV_FILE" ]; then
