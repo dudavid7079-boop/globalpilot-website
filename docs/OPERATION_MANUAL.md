@@ -457,6 +457,7 @@ https://api.telegram.org/bot<BOT_TOKEN>/getUpdates
 相关项：
 
 ```env
+REQUIRE_TELEGRAM_SYNC=true
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
 ```

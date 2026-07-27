@@ -15,6 +15,13 @@ if [ -n "${NEXT_PUBLIC_UMAMI_SCRIPT_URL:-}" ] && [ -z "${NEXT_PUBLIC_UMAMI_WEBSI
   exit 1
 fi
 
+if [ "${REQUIRE_TELEGRAM_SYNC:-true}" = "true" ]; then
+  if [ -z "${TELEGRAM_BOT_TOKEN:-}" ] || [ -z "${TELEGRAM_CHAT_ID:-}" ]; then
+    printf '%s\n' "REQUIRE_TELEGRAM_SYNC=true but TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is empty. Refusing to deploy without chat-to-Telegram sync." >&2
+    exit 1
+  fi
+fi
+
 docker compose -f compose.npm.yml --env-file .env.production up -d --build
 docker compose -f compose.npm.yml --env-file .env.production ps
 
