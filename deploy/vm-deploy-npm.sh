@@ -1,14 +1,22 @@
 #!/usr/bin/env sh
 set -eu
 
-APP_PORT="${APP_PORT:-3000}"
-
-if [ -f .env.production ]; then
-  set -a
-  # shellcheck disable=SC1091
-  . ./.env.production
-  set +a
+GLOBALPILOT_ENV_FILE="${GLOBALPILOT_ENV_FILE:-${ENV_FILE:-.env.globalpilot}}"
+if [ ! -f "$GLOBALPILOT_ENV_FILE" ] && [ -f .env.production ]; then
+  GLOBALPILOT_ENV_FILE=".env.production"
 fi
+
+if [ ! -f "$GLOBALPILOT_ENV_FILE" ]; then
+  printf 'GlobalPilot env file not found: %s\n' "$GLOBALPILOT_ENV_FILE" >&2
+  exit 1
+fi
+
+set -a
+# shellcheck disable=SC1090
+. "$GLOBALPILOT_ENV_FILE"
+set +a
+
+APP_PORT="${APP_PORT:-3000}"
 
 if [ -n "${NEXT_PUBLIC_UMAMI_SCRIPT_URL:-}" ] && [ -z "${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}" ]; then
   printf '%s\n' "NEXT_PUBLIC_UMAMI_SCRIPT_URL is set but NEXT_PUBLIC_UMAMI_WEBSITE_ID is empty. Refusing to deploy without analytics tracking." >&2
@@ -22,8 +30,8 @@ if [ "${REQUIRE_TELEGRAM_SYNC:-true}" = "true" ]; then
   fi
 fi
 
-docker compose -f compose.npm.yml --env-file .env.production up -d --build
-docker compose -f compose.npm.yml --env-file .env.production ps
+ENV_FILE="$GLOBALPILOT_ENV_FILE" docker compose -f compose.npm.yml --env-file "$GLOBALPILOT_ENV_FILE" up -d --build
+ENV_FILE="$GLOBALPILOT_ENV_FILE" docker compose -f compose.npm.yml --env-file "$GLOBALPILOT_ENV_FILE" ps
 
 for attempt in $(seq 1 30); do
   if curl --fail --silent --show-error "http://127.0.0.1:${APP_PORT}/api/health"; then

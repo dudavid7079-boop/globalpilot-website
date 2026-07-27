@@ -20,8 +20,10 @@ sudo mkdir -p /opt/globalpilot
 sudo chown "$USER":"$USER" /opt/globalpilot
 git clone https://github.com/dudavid7079-boop/globalpilot-website.git /opt/globalpilot
 cd /opt/globalpilot
-cp deploy/env.production.example .env.production
-nano .env.production
+cp deploy/env.globalpilot.example .env.globalpilot
+cp deploy/env.techpulse.example .env.techpulse
+nano .env.globalpilot
+nano .env.techpulse
 ```
 
 如果 NPM 和网站容器在同一台机器：
@@ -43,16 +45,22 @@ APP_PORT=3000
 ### 2. 启动网站应用
 
 ```bash
-docker compose -f compose.npm.yml --env-file .env.production up -d --build
+ENV_FILE=.env.globalpilot docker compose -f compose.npm.yml --env-file .env.globalpilot up -d --build
 docker compose -f compose.npm.yml ps
 curl -i http://127.0.0.1:3000/api/health
+```
+
+推荐使用脚本启动 GlobalPilot，它默认读取 `.env.globalpilot`，旧的 `.env.production` 只作为兼容 fallback：
+
+```bash
+./deploy/vm-deploy-npm.sh
 ```
 
 同时启动 TechPulse 静态站：
 
 ```bash
 ./deploy/vm-deploy-techpulse.sh
-docker compose -f compose.techpulse.yml --env-file .env.production ps
+docker compose -f compose.techpulse.yml --env-file .env.techpulse ps
 curl -I http://127.0.0.1:8103/health.json
 ```
 
@@ -123,7 +131,7 @@ cp deploy/env.production.example .env.production
 nano .env.production
 ```
 
-`.env.production` 不会提交到 Git。至少填写正式邮箱；AI Chat 上线前还需填写 Mac mini Ollama 地址。
+`.env.production` 不会提交到 Git。直连 Caddy 模式仍使用这个兼容文件；当前生产环境的 Nginx Proxy Manager / FRP 模式请优先使用 `.env.globalpilot` 和 `.env.techpulse` 两个拆分文件。
 
 ### 2. 首次启动
 
@@ -183,7 +191,7 @@ cd /opt/globalpilot
 docker compose ps
 docker compose logs --tail=200 app
 docker compose logs --tail=200 caddy
-docker compose --env-file .env.production up -d --build
+ENV_FILE=.env.globalpilot docker compose -f compose.npm.yml --env-file .env.globalpilot up -d --build
 ```
 
 Nginx Proxy Manager 模式下，TechPulse 单独查看：
@@ -195,6 +203,8 @@ docker compose -f compose.techpulse.yml logs --tail=100 techpulse
 ./deploy/vm-deploy-techpulse.sh
 ```
 
-不要把 `.env.production`、SSH 私钥或 Ollama 的 11434 端口公开到 GitHub/公网。
+不要把 `.env.production`、`.env.globalpilot`、`.env.techpulse`、`.env.umami`、SSH 私钥或 Ollama 的 11434 端口公开到 GitHub/公网。
+
+当前生产环境推荐不要继续新增 `.env.production` 变量；GlobalPilot 写入 `.env.globalpilot`，TechPulse 写入 `.env.techpulse`，Umami 服务自身写入 `.env.umami`。
 
 TechPulse 上线后的监控、每日 Top 20 自动刷新和公网校验见 [`TECHPULSE_OPERATIONS.md`](TECHPULSE_OPERATIONS.md)。

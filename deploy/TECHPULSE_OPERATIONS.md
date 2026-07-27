@@ -28,10 +28,17 @@ https://techpulse.attodigitalhk.com/topics.html
 https://techpulse.attodigitalhk.com/search.html
 ```
 
-The VM internal health checker also supports public checks. In `/opt/globalpilot/.env.production`, set:
+The VM internal health checker also supports public checks. Use split env files so GlobalPilot and TechPulse do not overwrite each other.
+
+In `/opt/globalpilot/.env.globalpilot`, set:
 
 ```env
 PUBLIC_HEALTH_URL=https://globalpilot.attodigitalhk.com/api/health
+```
+
+In `/opt/globalpilot/.env.techpulse`, set:
+
+```env
 TECHPULSE_PUBLIC_HEALTH_URL=https://techpulse.attodigitalhk.com/health.json
 ```
 
@@ -81,7 +88,7 @@ youtube-ai-tech-aggregator/pipeline/build-products.mjs
 youtube-ai-tech-aggregator/npm run prelaunch
 ```
 
-`collect-product-signals.mjs` fetches GitHub and Hacker News signals for the product radar. Add these to `/opt/globalpilot/.env.production` when available:
+`collect-product-signals.mjs` fetches GitHub and Hacker News signals for the product radar. Add these to `/opt/globalpilot/.env.techpulse` when available:
 
 ```bash
 GITHUB_TOKEN=...

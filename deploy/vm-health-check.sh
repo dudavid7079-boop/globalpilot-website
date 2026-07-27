@@ -2,6 +2,8 @@
 set -eu
 
 APP_DIR="${APP_DIR:-/opt/globalpilot}"
+GLOBALPILOT_ENV_FILE="${GLOBALPILOT_ENV_FILE:-${APP_DIR}/.env.globalpilot}"
+TECHPULSE_ENV_FILE="${TECHPULSE_ENV_FILE:-${APP_DIR}/.env.techpulse}"
 LOCAL_HEALTH_URL="${LOCAL_HEALTH_URL:-http://127.0.0.1:3000/api/health}"
 TECHPULSE_HEALTH_URL="${TECHPULSE_HEALTH_URL:-http://127.0.0.1:8103/health.json}"
 PUBLIC_HEALTH_URL="${PUBLIC_HEALTH_URL:-}"
@@ -10,10 +12,35 @@ STATE_FILE="${STATE_FILE:-/tmp/globalpilot-health-state}"
 
 cd "$APP_DIR"
 
-if [ -f .env.production ]; then
+case "$GLOBALPILOT_ENV_FILE" in
+  /*) ;;
+  *) GLOBALPILOT_ENV_FILE="${APP_DIR}/${GLOBALPILOT_ENV_FILE}" ;;
+esac
+
+case "$TECHPULSE_ENV_FILE" in
+  /*) ;;
+  *) TECHPULSE_ENV_FILE="${APP_DIR}/${TECHPULSE_ENV_FILE}" ;;
+esac
+
+if [ ! -f "$GLOBALPILOT_ENV_FILE" ] && [ -f "${APP_DIR}/.env.production" ]; then
+  GLOBALPILOT_ENV_FILE="${APP_DIR}/.env.production"
+fi
+
+if [ ! -f "$TECHPULSE_ENV_FILE" ] && [ -f "${APP_DIR}/.env.production" ]; then
+  TECHPULSE_ENV_FILE="${APP_DIR}/.env.production"
+fi
+
+if [ -f "$TECHPULSE_ENV_FILE" ]; then
   set -a
-  # shellcheck disable=SC1091
-  . ./.env.production
+  # shellcheck disable=SC1090
+  . "$TECHPULSE_ENV_FILE"
+  set +a
+fi
+
+if [ -f "$GLOBALPILOT_ENV_FILE" ] && [ "$GLOBALPILOT_ENV_FILE" != "$TECHPULSE_ENV_FILE" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  . "$GLOBALPILOT_ENV_FILE"
   set +a
 fi
 

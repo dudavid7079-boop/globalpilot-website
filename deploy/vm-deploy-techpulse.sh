@@ -1,20 +1,33 @@
 #!/usr/bin/env sh
 set -eu
 
-if [ -f .env.production ]; then
-  set -a
-  # shellcheck disable=SC1091
-  . ./.env.production
-  set +a
+TECHPULSE_ENV_FILE="${TECHPULSE_ENV_FILE:-.env.techpulse}"
+if [ ! -f "$TECHPULSE_ENV_FILE" ] && [ -f .env.production ]; then
+  TECHPULSE_ENV_FILE=".env.production"
 fi
+
+if [ ! -f "$TECHPULSE_ENV_FILE" ]; then
+  printf 'TechPulse env file not found: %s\n' "$TECHPULSE_ENV_FILE" >&2
+  exit 1
+fi
+
+set -a
+# shellcheck disable=SC1090
+. "$TECHPULSE_ENV_FILE"
+set +a
 
 TECHPULSE_PORT="${TECHPULSE_PORT:-8103}"
 TECHPULSE_PUBLIC_URL="${TECHPULSE_PUBLIC_URL:-https://techpulse.attodigitalhk.com}"
 TECHPULSE_RELEASE_MARKER="${TECHPULSE_RELEASE_MARKER:-20260712-product-radar-v2}"
 TECHPULSE_REQUIRE_PUBLIC_CHECK="${TECHPULSE_REQUIRE_PUBLIC_CHECK:-false}"
-TECHPULSE_UMAMI_SCRIPT_URL="${TECHPULSE_UMAMI_SCRIPT_URL:-${NEXT_PUBLIC_UMAMI_SCRIPT_URL:-}}"
-TECHPULSE_UMAMI_WEBSITE_ID="${TECHPULSE_UMAMI_WEBSITE_ID:-${NEXT_PUBLIC_UMAMI_WEBSITE_ID:-}}"
+TECHPULSE_UMAMI_SCRIPT_URL="${TECHPULSE_UMAMI_SCRIPT_URL:-}"
+TECHPULSE_UMAMI_WEBSITE_ID="${TECHPULSE_UMAMI_WEBSITE_ID:-}"
 NODE_IMAGE="${NODE_IMAGE:-node:22-alpine}"
+
+if [ -n "$TECHPULSE_UMAMI_SCRIPT_URL" ] && [ -z "$TECHPULSE_UMAMI_WEBSITE_ID" ]; then
+  printf '%s\n' "TECHPULSE_UMAMI_SCRIPT_URL is set but TECHPULSE_UMAMI_WEBSITE_ID is empty. Refusing to deploy without TechPulse analytics tracking." >&2
+  exit 1
+fi
 
 if command -v node >/dev/null 2>&1; then
   (cd youtube-ai-tech-aggregator && node pipeline/init-runtime-data.mjs)
@@ -34,8 +47,8 @@ cat > youtube-ai-tech-aggregator/analytics-config.local.json <<EOF
 }
 EOF
 
-docker compose -f compose.techpulse.yml --env-file .env.production up -d
-docker compose -f compose.techpulse.yml --env-file .env.production ps
+docker compose -f compose.techpulse.yml --env-file "$TECHPULSE_ENV_FILE" up -d
+docker compose -f compose.techpulse.yml --env-file "$TECHPULSE_ENV_FILE" ps
 
 for attempt in $(seq 1 20); do
   if curl --fail --silent --show-error "http://127.0.0.1:${TECHPULSE_PORT}/health.json" >/dev/null; then

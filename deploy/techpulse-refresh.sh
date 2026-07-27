@@ -50,7 +50,14 @@ finish_refresh() {
 
 trap finish_refresh EXIT HUP INT TERM
 
-ENV_FILE="${APP_DIR}/.env.production"
+ENV_FILE="${TECHPULSE_ENV_FILE:-${APP_DIR}/.env.techpulse}"
+case "$ENV_FILE" in
+  /*) ;;
+  *) ENV_FILE="${APP_DIR}/${ENV_FILE}" ;;
+esac
+if [ ! -f "$ENV_FILE" ] && [ -f "${APP_DIR}/.env.production" ]; then
+  ENV_FILE="${APP_DIR}/.env.production"
+fi
 
 if [ -f "$ENV_FILE" ]; then
   set -a

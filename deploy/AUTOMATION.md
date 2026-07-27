@@ -222,7 +222,7 @@ VM 可以每 5 分钟检查：
 http://127.0.0.1:3000/api/health
 ```
 
-如果失败，会使用 `.env.production` 中的 `TELEGRAM_BOT_TOKEN` 和 `TELEGRAM_CHAT_ID` 给你发 Telegram 告警；恢复后也会发恢复通知。
+如果失败，会优先使用 `.env.globalpilot` 中的 `TELEGRAM_BOT_TOKEN` 和 `TELEGRAM_CHAT_ID` 给你发 Telegram 告警；恢复后也会发恢复通知。旧的 `.env.production` 只作为兼容 fallback。
 
 公网域名建议用 UptimeRobot / Better Stack 从外部监控。部分 NPM/FRP 网络不支持 VM 访问自己的公网域名，容易产生误报；如果你的网络支持，也可以给 service 增加 `PUBLIC_HEALTH_URL=https://globalpilot.attodigitalhk.com/api/health`。
 
@@ -266,6 +266,16 @@ GlobalPilot 和 TechPulse 分开部署，避免两个 Compose project 抢占同�
 deploy/vm-deploy-npm.sh       -> 只部署 GlobalPilot，检查 http://127.0.0.1:3000/api/health
 deploy/vm-deploy-techpulse.sh -> 只部署 TechPulse，检查 http://127.0.0.1:8103/health.json
 ```
+
+环境变量也建议分开：
+
+```text
+.env.globalpilot -> GlobalPilot 主站、Ollama、Telegram、GlobalPilot Umami
+.env.techpulse   -> TechPulse 端口、TechPulse Umami、产品雷达采集参数
+.env.umami       -> Umami 自身数据库和密钥
+```
+
+旧的 `.env.production` 仍可作为兼容 fallback，但不要再把两个网站的新变量混在里面。
 
 手动启动 TechPulse：
 

@@ -127,28 +127,35 @@ Umami 会生成 `Website ID`。
 
 ```bash
 cd /opt/globalpilot
-nano .env.production
+nano .env.globalpilot
+nano .env.techpulse
 ```
 
-填写：
+`.env.globalpilot` 填写：
 
 ```env
 NEXT_PUBLIC_UMAMI_SCRIPT_URL=https://analytics.globalpilot.attodigitalhk.com/script.js
 NEXT_PUBLIC_UMAMI_WEBSITE_ID=从 Umami 后台复制的网站 ID
+```
+
+`.env.techpulse` 填写：
+
+```env
 TECHPULSE_UMAMI_SCRIPT_URL=https://analytics.globalpilot.attodigitalhk.com/script.js
-TECHPULSE_UMAMI_WEBSITE_ID=TechPulse 对应的网站 ID，也可复用上面的 ID
+TECHPULSE_UMAMI_WEBSITE_ID=TechPulse 对应的网站 ID
 ```
 
 然后重建网站：
 
 ```bash
-docker compose -f compose.npm.yml --env-file .env.production up -d --build
+./deploy/vm-deploy-npm.sh
+./deploy/vm-deploy-techpulse.sh
 ```
 
 如果只更新 TechPulse 静态站，可执行：
 
 ```bash
-./deploy/vm-deploy-npm.sh
+./deploy/vm-deploy-techpulse.sh
 ```
 
 部署脚本会生成 `youtube-ai-tech-aggregator/analytics-config.local.json`，该文件不提交到 Git，只在服务器本机提供 Umami 配置。

@@ -59,11 +59,18 @@ techpulse.attodigitalhk.com   -> NPM_PUBLIC_IP
 
 ## 4. VM 端口
 
-`.env.production` 推荐保持：
+当前生产环境推荐拆分变量。
+
+`.env.globalpilot`：
 
 ```env
 APP_BIND=127.0.0.1
 APP_PORT=3000
+```
+
+`.env.techpulse`：
+
+```env
 TECHPULSE_BIND=127.0.0.1
 TECHPULSE_PORT=8103
 ```

@@ -76,6 +76,16 @@ techpulse.attodigitalhk.com               -> VM:8103
 
 GlobalPilot 和 TechPulse 分开部署：`deploy/vm-deploy-npm.sh` 只部署 GlobalPilot，`deploy/vm-deploy-techpulse.sh` 只部署 TechPulse。不要在 GlobalPilot 部署脚本里启动 TechPulse，否则可能和已有的 `techpulse-techpulse-1` 容器抢占 `8103`。
 
+环境变量也要分开：
+
+```text
+.env.globalpilot -> GlobalPilot 主站、Ollama、Telegram、GlobalPilot Umami
+.env.techpulse   -> TechPulse 端口、TechPulse Umami、产品雷达采集参数
+.env.umami       -> Umami 自身数据库和密钥
+```
+
+旧的 `.env.production` 只保留为兼容 fallback，不建议继续把两个网站的新变量混在一起。
+
 ### 1.4 已完成模块
 
 - Next.js 个人品牌网站
@@ -252,13 +262,13 @@ cd /opt/globalpilot
 ### 6.2 查看网站容器
 
 ```bash
-docker compose -f compose.npm.yml --env-file .env.production ps
+ENV_FILE=.env.globalpilot docker compose -f compose.npm.yml --env-file .env.globalpilot ps
 ```
 
 查看日志：
 
 ```bash
-docker compose -f compose.npm.yml --env-file .env.production logs --tail=100 app
+ENV_FILE=.env.globalpilot docker compose -f compose.npm.yml --env-file .env.globalpilot logs --tail=100 app
 ```
 
 健康检查：
@@ -288,7 +298,7 @@ cd /opt/globalpilot
 如果只是重建当前版本：
 
 ```bash
-docker compose -f compose.npm.yml --env-file .env.production up -d --build app
+ENV_FILE=.env.globalpilot docker compose -f compose.npm.yml --env-file .env.globalpilot up -d --build app
 ```
 
 注意：不要在主站部署命令里加 `--remove-orphans`。Umami 和主站当前共用同一个目录项目名，主站 Compose 会把 Umami 容器识别成 orphan；如果清理 orphan，会导致 `analytics.globalpilot.attodigitalhk.com` 变成 504。
@@ -451,7 +461,7 @@ https://api.telegram.org/bot<BOT_TOKEN>/getUpdates
 配置在：
 
 ```text
-/opt/globalpilot/.env.production
+/opt/globalpilot/.env.globalpilot
 ```
 
 相关项：
@@ -466,7 +476,7 @@ TELEGRAM_CHAT_ID=
 
 ```bash
 cd /opt/globalpilot
-docker compose -f compose.npm.yml --env-file .env.production up -d --build app
+./deploy/vm-deploy-npm.sh
 ```
 
 ## 10. Umami 访问统计
@@ -504,7 +514,7 @@ Website ID：
 VM 配置文件：
 
 ```text
-/opt/globalpilot/.env.production
+/opt/globalpilot/.env.globalpilot
 ```
 
 相关项：
@@ -607,7 +617,7 @@ VM 上：
 
 ```bash
 cd /opt/globalpilot
-docker compose -f compose.npm.yml --env-file .env.production ps
+ENV_FILE=.env.globalpilot docker compose -f compose.npm.yml --env-file .env.globalpilot ps
 curl -i http://127.0.0.1:3000/api/health
 ```
 
@@ -619,7 +629,7 @@ curl -i http://127.0.0.1:3000/api/health
 
 ```bash
 curl --max-time 10 http://100.76.12.21:11434/api/tags
-docker compose -f compose.npm.yml --env-file .env.production logs --tail=100 app
+ENV_FILE=.env.globalpilot docker compose -f compose.npm.yml --env-file .env.globalpilot logs --tail=100 app
 ```
 
 优先确认 Mac mini Ollama 和 Tailscale。
