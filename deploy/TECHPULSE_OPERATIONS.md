@@ -42,6 +42,8 @@ In `/opt/globalpilot/.env.techpulse`, set:
 TECHPULSE_PUBLIC_HEALTH_URL=https://techpulse.attodigitalhk.com/health.json
 ```
 
+If the VM reaches the websites through FRP + Nginx Proxy Manager, public loopback can time out even when visitors can open the sites normally. In that case, leave both variables empty and use an external monitor such as UptimeRobot or Better Stack for public-domain checks.
+
 Then install or restart the health timer:
 
 ```bash
