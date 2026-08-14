@@ -21,10 +21,32 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const umamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL;
   const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteConfig.url}/#organization`,
+        name: siteConfig.name,
+        url: siteConfig.url,
+        email: siteConfig.email,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteConfig.url}/#website`,
+        name: siteConfig.name,
+        url: siteConfig.url,
+        description: siteConfig.description,
+        publisher: { "@id": `${siteConfig.url}/#organization` },
+        inLanguage: "zh-CN",
+      },
+    ],
+  };
 
   return (
     <html lang="zh-CN">
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
         {umamiScriptUrl && umamiWebsiteId && (
           <Script
             src={umamiScriptUrl}
