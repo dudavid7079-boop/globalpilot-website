@@ -23,7 +23,7 @@ const proof = ["Next.js websites", "Obsidian publishing", "Local Ollama / Qwen",
 
 export default function EnglishHomePage() {
   return (
-    <main className="en-page">
+    <main className="en-page" lang="en">
       <section className="service-hero en-hero">
         <span className="kicker">GLOBALPILOT / ENGLISH</span>
         <h1>Build an AI-native<br/><em>growth system.</em></h1>

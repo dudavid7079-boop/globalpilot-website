@@ -71,7 +71,7 @@ export default async function EnglishServicePage({ params }: { params: Promise<{
   };
 
   return (
-    <main className="service-detail en-page">
+    <main className="service-detail en-page" lang="en">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <section className="service-detail-hero">
         <Link className="back" href="/en">← English home</Link>
