@@ -86,6 +86,24 @@ GlobalPilot 和 TechPulse 分开部署：`deploy/vm-deploy-npm.sh` 只部署 Glo
 
 旧的 `.env.production` 只保留为兼容 fallback，不建议继续把两个网站的新变量混在一起。
 
+### IndexNow 搜索引擎推送
+
+GlobalPilot 已启用 IndexNow，用于在文章或页面更新后主动通知支持 IndexNow 的搜索引擎。
+
+- Key 文件：`/897932c3-89e0-416a-8700-0c5c5a36f0df.txt`
+- 提交脚本：`npm run seo:indexnow`
+- 生产部署：`deploy/vm-deploy-npm.sh` 在主站健康检查通过后，会读取 `.env.globalpilot` 里的 `INDEXNOW_KEY` 并自动提交首页、服务页、博客列表、文章页、RSS 和 sitemap。
+
+如需手动提交：
+
+```bash
+cd /opt/globalpilot
+set -a
+. ./.env.globalpilot
+set +a
+npm run seo:indexnow
+```
+
 ### 1.4 已完成模块
 
 - Next.js 个人品牌网站

@@ -49,4 +49,19 @@ for attempt in $(seq 1 30); do
   sleep 2
 done
 
+if [ -n "${INDEXNOW_KEY:-}" ]; then
+  if command -v node >/dev/null 2>&1; then
+    npm run seo:indexnow || printf '%s\n' "IndexNow submission failed; deployment remains healthy." >&2
+  else
+    docker run --rm \
+      -v "$(pwd):/work" \
+      -w /work \
+      -e NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-}" \
+      -e INDEXNOW_KEY="${INDEXNOW_KEY:-}" \
+      -e INDEXNOW_ENDPOINT="${INDEXNOW_ENDPOINT:-}" \
+      "${NODE_IMAGE:-node:22-alpine}" \
+      node scripts/indexnow-submit.mjs || printf '%s\n' "IndexNow submission failed; deployment remains healthy." >&2
+  fi
+fi
+
 docker image prune -f
