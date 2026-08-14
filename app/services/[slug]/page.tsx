@@ -29,12 +29,33 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Service",
-    name: service.title,
-    description: service.description,
-    provider: { "@type": "Person", name: siteConfig.author, url: siteConfig.url },
-    areaServed: "Global",
-    url: `${siteConfig.url}/services/${service.slug}`,
+    "@graph": [
+      {
+        "@type": "Service",
+        "@id": `${siteConfig.url}/services/${service.slug}#service`,
+        name: service.title,
+        alternateName: service.shortTitle,
+        description: service.description,
+        provider: { "@type": "Person", name: siteConfig.author, url: `${siteConfig.url}/about` },
+        areaServed: "Global",
+        serviceType: service.label,
+        url: `${siteConfig.url}/services/${service.slug}`,
+        offers: {
+          "@type": "Offer",
+          availability: "https://schema.org/InStock",
+          url: `${siteConfig.url}/services/${service.slug}`,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${siteConfig.url}/services/${service.slug}#breadcrumb`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+          { "@type": "ListItem", position: 2, name: "Services", item: `${siteConfig.url}/services` },
+          { "@type": "ListItem", position: 3, name: service.shortTitle, item: `${siteConfig.url}/services/${service.slug}` },
+        ],
+      },
+    ],
   };
 
   return (

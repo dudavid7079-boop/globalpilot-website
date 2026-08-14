@@ -8,6 +8,10 @@
 
 [`docs/OPERATION_MANUAL.md`](docs/OPERATION_MANUAL.md)
 
+SEO / IndexNow / 内容复盘清单见：
+
+[`docs/SEO_PLAYBOOK.md`](docs/SEO_PLAYBOOK.md)
+
 ## 本地运行
 
 ```bash
