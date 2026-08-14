@@ -55,6 +55,18 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           { "@type": "ListItem", position: 3, name: service.shortTitle, item: `${siteConfig.url}/services/${service.slug}` },
         ],
       },
+      {
+        "@type": "FAQPage",
+        "@id": `${siteConfig.url}/services/${service.slug}#faq`,
+        mainEntity: service.faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
+      },
     ],
   };
 
@@ -109,6 +121,21 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
             <b>First useful step</b>
             <p>{service.example.firstStep}</p>
           </div>
+        </div>
+      </section>
+
+      <section className="service-faq" aria-labelledby="service-faq-title">
+        <div>
+          <span className="kicker">FAQ</span>
+          <h2 id="service-faq-title">Questions worth answering before we build.</h2>
+        </div>
+        <div className="faq-list">
+          {service.faqs.map((faq) => (
+            <details key={faq.question}>
+              <summary>{faq.question}</summary>
+              <p>{faq.answer}</p>
+            </details>
+          ))}
         </div>
       </section>
 
