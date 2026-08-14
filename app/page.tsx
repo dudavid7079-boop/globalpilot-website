@@ -3,6 +3,17 @@ import TrackedLink from "@/components/TrackedLink";
 import { getAllPosts } from "@/lib/posts";
 import { services } from "@/lib/services";
 import { siteConfig } from "@/lib/site";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+    languages: {
+      "zh-CN": "/",
+      en: "/en",
+    },
+  },
+};
 
 const workflow = ["Obsidian 写作", "GitHub 同步", "VM / NPM 发布", "AI Chat 接入 Telegram"];
 const proof = [

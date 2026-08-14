@@ -24,7 +24,7 @@ function readServiceSlugs() {
   const serviceFile = path.join(root, "lib", "services.ts");
   if (!fs.existsSync(serviceFile)) return [];
   const source = fs.readFileSync(serviceFile, "utf8");
-  return Array.from(source.matchAll(/slug:\s*"([^"]+)"/g), (match) => `/services/${match[1]}`);
+  return Array.from(source.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
 }
 
 function buildUrlList() {
@@ -34,9 +34,10 @@ function buildUrlList() {
     "/services",
     "/blog",
     "/chat",
+    "/en",
     "/feed.xml",
     "/sitemap.xml",
-    ...readServiceSlugs(),
+    ...readServiceSlugs().flatMap((slug) => [`/services/${slug}`, `/en/services/${slug}`]),
     ...readSlugsFromBlog(),
   ];
   return Array.from(new Set(paths)).map((urlPath) => `${siteUrl}${urlPath === "/" ? "" : urlPath}`);

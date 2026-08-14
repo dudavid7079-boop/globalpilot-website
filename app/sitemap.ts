@@ -10,8 +10,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/services", changeFrequency: "monthly" as const, priority: 0.85 },
     { path: "/blog", changeFrequency: "weekly" as const, priority: 0.8 },
     { path: "/chat", changeFrequency: "monthly" as const, priority: 0.65 },
+    { path: "/en", changeFrequency: "monthly" as const, priority: 0.8 },
   ].map((page) => ({ url: `${siteConfig.url}${page.path}`, lastModified: new Date(), changeFrequency: page.changeFrequency, priority: page.priority }));
   const servicePages = services.map((service) => ({ url: `${siteConfig.url}/services/${service.slug}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.75 }));
+  const englishServicePages = services.map((service) => ({ url: `${siteConfig.url}/en/services/${service.slug}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.72 }));
   const posts = getAllPosts().map((post) => ({ url: `${siteConfig.url}/blog/${post.slug}`, lastModified: new Date(`${post.date}T00:00:00+08:00`), changeFrequency: "monthly" as const, priority: 0.7 }));
-  return [...pages, ...servicePages, ...posts];
+  return [...pages, ...servicePages, ...englishServicePages, ...posts];
 }

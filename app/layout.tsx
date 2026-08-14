@@ -63,6 +63,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <TrackedLink href="/blog" eventName="nav_click" eventData={{ item: "articles" }}>Articles</TrackedLink>
             <TrackedLink href="/chat" eventName="nav_click" eventData={{ item: "ai_chat" }}>AI Chat</TrackedLink>
             <TrackedLink href="/about" eventName="nav_click" eventData={{ item: "about" }}>About</TrackedLink>
+            <TrackedLink href="/en" eventName="nav_click" eventData={{ item: "english" }}>EN</TrackedLink>
             <TrackedLink className="nav-cta" href={`mailto:${siteConfig.email}`} eventName="cta_click" eventData={{ location: "nav", action: "email" }}>Let’s talk <span>↗</span></TrackedLink>
           </nav>
         </header>
