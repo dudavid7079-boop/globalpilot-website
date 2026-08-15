@@ -6,7 +6,7 @@ import html from "remark-html";
 
 const postsDirectory = path.join(process.cwd(), "content/blog");
 
-type Frontmatter = { title?: unknown; date?: unknown; description?: unknown; tags?: unknown };
+type Frontmatter = { title?: unknown; date?: unknown; description?: unknown; tags?: unknown; lang?: unknown };
 
 function normalizePost(file: string, data: Frontmatter, content: string): Post {
   const slug = file.replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/, "");
@@ -15,7 +15,8 @@ function normalizePost(file: string, data: Frontmatter, content: string): Post {
   if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error(`${file}: date 必须为 YYYY-MM-DD`);
   if (typeof data.description !== "string" || !data.description.trim()) throw new Error(`${file}: 缺少 description`);
   if (!Array.isArray(data.tags) || !data.tags.every((tag) => typeof tag === "string")) throw new Error(`${file}: tags 必须为字符串数组`);
-  return { slug, title: data.title.trim(), date, description: data.description.trim(), tags: data.tags, readTime: `${Math.max(3, Math.ceil(content.length / 500))} min` };
+  const lang = data.lang === "en" ? "en" : "zh-CN";
+  return { slug, title: data.title.trim(), date, description: data.description.trim(), tags: data.tags, lang, readTime: `${Math.max(3, Math.ceil(content.length / 500))} min` };
 }
 
 export type Post = {
@@ -24,6 +25,7 @@ export type Post = {
   date: string;
   description: string;
   tags: string[];
+  lang: "zh-CN" | "en";
   readTime: string;
   content?: string;
 };

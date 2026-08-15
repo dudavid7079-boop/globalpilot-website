@@ -44,7 +44,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         publisher: { "@type": "Organization", name: siteConfig.name, url: siteConfig.url },
         mainEntityOfPage: `${siteConfig.url}/blog/${post.slug}`,
         articleSection: post.tags,
-        inLanguage: "zh-CN",
+        inLanguage: post.lang,
       },
       {
         "@type": "BreadcrumbList",
@@ -58,7 +58,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     ],
   };
   return <main className="post-page">
-    <article>
+    <article lang={post.lang}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}/>
       <Link href="/blog" className="back">← All field notes</Link>
       <header className="post-header"><div className="post-tags">{post.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><h1>{post.title}</h1><p>{post.description}</p><div className="meta"><time>{post.date}</time><span>{post.readTime} read</span></div></header>

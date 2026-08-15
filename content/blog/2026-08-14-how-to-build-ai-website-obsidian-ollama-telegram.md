@@ -3,6 +3,7 @@ title: How to Build an AI Website with Obsidian, Ollama, and Telegram
 date: 2026-08-14
 description: A practical guide to building an AI-native personal website with a Markdown blog, Obsidian publishing workflow, local Ollama models, and Telegram lead notifications.
 tags: [AI, Website, Ollama, Obsidian, Automation]
+lang: en
 ---
 
 # How to Build an AI Website with Obsidian, Ollama, and Telegram
