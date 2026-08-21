@@ -10,8 +10,33 @@ export const metadata: Metadata = {
 };
 
 export default function ServicesPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${siteConfig.url}/services#collection`,
+        name: "GlobalPilot Services",
+        description: "GlobalPilot 提供 AI 官网、业务自动化与全球增长相关服务。",
+        url: `${siteConfig.url}/services`,
+        inLanguage: "zh-CN",
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${siteConfig.url}/services#itemlist`,
+        itemListElement: services.map((service, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: service.title,
+          description: service.description,
+          url: `${siteConfig.url}/services/${service.slug}`,
+        })),
+      },
+    ],
+  };
   return (
     <main className="services-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <section className="service-hero">
         <span className="kicker">GLOBALPILOT / SERVICES</span>
         <h1>Build the system<br/><em>behind the idea.</em></h1>

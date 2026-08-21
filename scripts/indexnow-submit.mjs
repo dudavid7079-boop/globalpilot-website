@@ -37,6 +37,8 @@ function buildUrlList() {
     "/en",
     "/feed.xml",
     "/sitemap.xml",
+    "/llms.txt",
+    "/llms-full.txt",
     ...readServiceSlugs().flatMap((slug) => [`/services/${slug}`, `/en/services/${slug}`]),
     ...readSlugsFromBlog(),
   ];

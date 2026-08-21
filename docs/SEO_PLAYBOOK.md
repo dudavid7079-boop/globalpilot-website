@@ -13,6 +13,7 @@
 - 服务页 `Service` + `BreadcrumbList` 结构化数据
 - 文章页底部增加相关文章内链
 - 页面 canonical、Open Graph、Twitter Card 已配置
+- `llms.txt` 和 `llms-full.txt` 已生成，帮助 AI 搜索和 LLM crawler 快速理解站点结构
 
 ## 每次发布文章前
 

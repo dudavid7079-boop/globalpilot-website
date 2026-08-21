@@ -11,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/blog", changeFrequency: "weekly" as const, priority: 0.8 },
     { path: "/chat", changeFrequency: "monthly" as const, priority: 0.65 },
     { path: "/en", changeFrequency: "monthly" as const, priority: 0.8 },
+    { path: "/llms.txt", changeFrequency: "weekly" as const, priority: 0.4 },
+    { path: "/llms-full.txt", changeFrequency: "weekly" as const, priority: 0.35 },
   ].map((page) => ({ url: `${siteConfig.url}${page.path}`, lastModified: new Date(), changeFrequency: page.changeFrequency, priority: page.priority }));
   const servicePages = services.map((service) => ({ url: `${siteConfig.url}/services/${service.slug}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.75 }));
   const englishServicePages = services.map((service) => ({ url: `${siteConfig.url}/en/services/${service.slug}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.72 }));
