@@ -12,6 +12,7 @@
 - 文章页 `BlogPosting` + `BreadcrumbList` 结构化数据
 - 服务页 `Service` + `BreadcrumbList` 结构化数据
 - 文章页底部增加相关文章内链
+- 文章标签页 `/blog/tag/[tag]` 已接入，自动形成 topic cluster 页面
 - 页面 canonical、Open Graph、Twitter Card 已配置
 - `llms.txt` 和 `llms-full.txt` 已生成，帮助 AI 搜索和 LLM crawler 快速理解站点结构
 
@@ -28,7 +29,14 @@
    - 链到相关服务页
    - 链到上一篇/相关主题文章
    - 链到 `/chat` 作为咨询入口
-5. 发布后确认：
+5. Tags 尽量复用已有主题词，形成稳定内容集群，例如：
+   - `AI`
+   - `Website`
+   - `SEO`
+   - `GEO`
+   - `Automation`
+   - `Ollama`
+6. 发布后确认：
 
 ```bash
 npm run validate:content
@@ -55,8 +63,8 @@ npm run seo:indexnow
 
 ## 下一批推荐优化
 
-1. 接入 Google Search Console 和 Bing Webmaster Tools。
-2. 增加英文入口页 `/en`，承接海外关键词。
-3. 服务页增加 FAQ 区块，并输出 `FAQPage` schema。
-4. 给重点文章增加原创图或流程图，提升分享点击率。
-5. 将高价值文章拆成系列文章，形成 topic cluster。
+1. 在 Google Search Console 提交 `https://globalpilot.attodigitalhk.com/sitemap.xml`。
+2. 在 Bing Webmaster Tools 提交同一个 sitemap，并确认 IndexNow key 文件可访问。
+3. 给重点文章增加原创图或流程图，提升分享点击率。
+4. 将高价值文章拆成系列文章，持续扩大 topic cluster。
+5. 每月检查 `/blog/tag/SEO`、`/blog/tag/AI`、`/blog/tag/Website` 这类聚合页是否有足够内容支撑。

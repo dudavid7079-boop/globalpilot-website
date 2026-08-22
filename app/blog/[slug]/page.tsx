@@ -61,7 +61,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     <article lang={post.lang}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}/>
       <Link href="/blog" className="back">← All field notes</Link>
-      <header className="post-header"><div className="post-tags">{post.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><h1>{post.title}</h1><p>{post.description}</p><div className="meta"><time>{post.date}</time><span>{post.readTime} read</span></div></header>
+      <header className="post-header"><div className="post-tags">{post.tags.map((tag) => <TrackedLink href={`/blog/tag/${encodeURIComponent(tag)}`} eventName="tag_click" eventData={{ tag, slug: post.slug }} key={tag}>{tag}</TrackedLink>)}</div><h1>{post.title}</h1><p>{post.description}</p><div className="meta"><time>{post.date}</time><span>{post.readTime} read</span></div></header>
       <div className="post-divider"><span>✦</span></div>
       <div className="prose" dangerouslySetInnerHTML={{ __html: post.content! }}/>
       {relatedPosts.length > 0 && (

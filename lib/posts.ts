@@ -41,6 +41,15 @@ export function getAllPosts(): Post[] {
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
+export function getAllTags(): string[] {
+  return Array.from(new Set(getAllPosts().flatMap((post) => post.tags))).sort((a, b) => a.localeCompare(b));
+}
+
+export function getPostsByTag(tag: string): Post[] {
+  const normalizedTag = decodeURIComponent(tag).toLowerCase();
+  return getAllPosts().filter((post) => post.tags.some((item) => item.toLowerCase() === normalizedTag));
+}
+
 export async function getPost(slug: string): Promise<Post | null> {
   const match = fs.readdirSync(postsDirectory).find((file) => file.replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/, "") === slug);
   if (!match) return null;

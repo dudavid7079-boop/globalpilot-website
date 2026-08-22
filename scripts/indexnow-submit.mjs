@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import matter from "gray-matter";
 
 const root = process.cwd();
 const defaultKey = "897932c3-89e0-416a-8700-0c5c5a36f0df";
@@ -18,6 +19,20 @@ function readSlugsFromBlog() {
     .map((file) => file.replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/, ""))
     .filter(Boolean)
     .map((slug) => `/blog/${slug}`);
+}
+
+function readTagsFromBlog() {
+  const blogDir = path.join(root, "content", "blog");
+  if (!fs.existsSync(blogDir)) return [];
+  return Array.from(new Set(fs
+    .readdirSync(blogDir)
+    .filter((file) => file.endsWith(".md"))
+    .flatMap((file) => {
+      const source = fs.readFileSync(path.join(blogDir, file), "utf8");
+      const { data } = matter(source);
+      return Array.isArray(data.tags) ? data.tags.filter((tag) => typeof tag === "string") : [];
+    })))
+    .map((tag) => `/blog/tag/${encodeURIComponent(tag)}`);
 }
 
 function readServiceSlugs() {
@@ -40,6 +55,7 @@ function buildUrlList() {
     "/llms.txt",
     "/llms-full.txt",
     ...readServiceSlugs().flatMap((slug) => [`/services/${slug}`, `/en/services/${slug}`]),
+    ...readTagsFromBlog(),
     ...readSlugsFromBlog(),
   ];
   return Array.from(new Set(paths)).map((urlPath) => `${siteUrl}${urlPath === "/" ? "" : urlPath}`);
