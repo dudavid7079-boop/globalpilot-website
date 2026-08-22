@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
 
 const root = process.cwd();
 const defaultKey = "897932c3-89e0-416a-8700-0c5c5a36f0df";
@@ -21,6 +20,24 @@ function readSlugsFromBlog() {
     .map((slug) => `/blog/${slug}`);
 }
 
+function parseTagsFromFrontmatter(source) {
+  const frontmatter = source.match(/^---\n([\s\S]*?)\n---/);
+  if (!frontmatter) return [];
+  const tagsLine = frontmatter[1].match(/^tags:\s*\[(.*?)\]\s*$/m);
+  if (tagsLine) {
+    return tagsLine[1]
+      .split(",")
+      .map((tag) => tag.trim().replace(/^["']|["']$/g, ""))
+      .filter(Boolean);
+  }
+  const block = frontmatter[1].match(/^tags:\s*\n((?:\s*-\s*.+\n?)+)/m);
+  if (!block) return [];
+  return block[1]
+    .split("\n")
+    .map((line) => line.match(/^\s*-\s*(.+?)\s*$/)?.[1]?.replace(/^["']|["']$/g, ""))
+    .filter(Boolean);
+}
+
 function readTagsFromBlog() {
   const blogDir = path.join(root, "content", "blog");
   if (!fs.existsSync(blogDir)) return [];
@@ -29,8 +46,7 @@ function readTagsFromBlog() {
     .filter((file) => file.endsWith(".md"))
     .flatMap((file) => {
       const source = fs.readFileSync(path.join(blogDir, file), "utf8");
-      const { data } = matter(source);
-      return Array.isArray(data.tags) ? data.tags.filter((tag) => typeof tag === "string") : [];
+      return parseTagsFromFrontmatter(source);
     })))
     .map((tag) => `/blog/tag/${encodeURIComponent(tag)}`);
 }
